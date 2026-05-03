@@ -872,19 +872,19 @@ function refreshAnalyzerInputs(){
     crit:{title:'Severe Hip Restriction',text:'Iliopsoas very tight, causing chronic low back pain.',issues:['Chronic low back pain','Forward-tilted pelvis','Hip impingement','Weak glutes'],pkg:'Elite - 12 sessions/month'},
     mod:{title:'Moderate Hip Restriction',text:'Significant hip flexor tightness from prolonged sitting.',issues:['Lower back stiffness','Hunched posture','Short stride length'],pkg:'Intensive - 8 sessions/month'},
     mild:{title:'Mild Hip Restriction',text:'Below goal but close. Achievable with consistent sessions.',issues:['Minor back fatigue','Shallow squat depth'],pkg:'Basic - 4 sessions/month'},
-    good:{title:'Excellent Hip Mobility',text:'Hip flexion meets the 90 deg goal. Iliopsoas works well.',issues:['Maintain mobility','Watch for asymmetry'],pkg:'Maintenance - 2 sessions/month'}
+    good:{title:'Excellent Hip Mobility',text:'Hip flexion meets the 90 deg goal.',issues:['Maintain mobility','Watch for asymmetry'],pkg:'Maintenance - 2 sessions/month'}
   },
   ham:{
     crit:{title:'Severe Hamstring Restriction',text:'Hamstrings pulling on sacrum, causing sciatic nerve tension.',issues:['Sciatic pain','Disc compression','Knee hyperextension'],pkg:'Elite - 12 sessions/month'},
     mod:{title:'Moderate Hamstring Restriction',text:'Restricted posterior chain causing lumbar strain.',issues:['Lower back tightness','Rounded back when bending','Reduced running performance'],pkg:'Intensive - 8 sessions/month'},
     mild:{title:'Mild Hamstring Restriction',text:'Approaching goal. Reachable in 4-8 weeks.',issues:['Slight running fatigue','Limited forward bending'],pkg:'Basic - 4 sessions/month'},
-    good:{title:'Excellent Hamstring Mobility',text:'Hamstrings meet 90 deg goal. Posterior chain optimal.',issues:['Maintain to prevent regression'],pkg:'Maintenance - 2 sessions/month'}
+    good:{title:'Excellent Hamstring Mobility',text:'Hamstrings meet 90 deg goal.',issues:['Maintain to prevent regression'],pkg:'Maintenance - 2 sessions/month'}
   },
   quad:{
     crit:{title:'Severe Quad Restriction',text:'Severely limits squatting; causes patellar compression.',issues:['Patellar pain syndrome','Cannot squat properly','Knee pain on stairs'],pkg:'Elite - 12 sessions/month'},
     mod:{title:'Moderate Quad Restriction',text:'Limits athletic performance and creates anterior knee stress.',issues:['Limited squat depth','Front thigh tightness','Anterior knee discomfort'],pkg:'Intensive - 8 sessions/month'},
     mild:{title:'Mild Quad Restriction',text:'Close to functional goal. Daily activities minimally impacted.',issues:['Mild quad fatigue','Slight squat limitation'],pkg:'Basic - 4 sessions/month'},
-    good:{title:'Excellent Quad Mobility',text:'Healthy quadriceps length. Patellar tracking supported.',issues:['Maintain monthly','Check side-to-side balance'],pkg:'Maintenance - 2 sessions/month'}
+    good:{title:'Excellent Quad Mobility',text:'Healthy quadriceps length.',issues:['Maintain monthly','Check side-to-side balance'],pkg:'Maintenance - 2 sessions/month'}
   }
 };
 var IMBAL_INFO={
@@ -909,7 +909,7 @@ function runDiag(){
   var pkgMap={crit:'Elite Package - 12 sessions/month',mod:'Intensive Package - 8 sessions/month',mild:'Basic Package - 4 sessions/month',good:'Maintenance Package - 2 sessions/month'};
   document.getElementById('diag-empty').style.display='none';
   var html='';
-  html+='<div class="dcard"><div class="dcard-hd" data-cardtoggle="c-overall"><h4>&#127919; Overall Assessment</h4><span class="sev '+levSev(worst)+'">'+levLabel(worst)+'</span></div><div class="dcard-body open" id="c-overall"><div class="rec-box"><strong>Recommended Package</strong><p style="color:var(--pink);font-weight:700;font-size:13px">'+pkgMap[worst]+'</p></div></div></div>';
+  html+='<div class="dcard"><div class="dcard-hd" data-cardtoggle="c-overall"><h4>Overall Assessment</h4><span class="sev '+levSev(worst)+'">'+levLabel(worst)+'</span></div><div class="dcard-body open" id="c-overall"><div class="rec-box"><strong>Recommended Package</strong><p style="color:var(--pink);font-weight:700;font-size:13px">'+pkgMap[worst]+'</p></div></div></div>';
   lastDiag={vals:vals,keys:keys,labels:labels,worst:worst,pkgMap:pkgMap,clientName:document.getElementById('diag-client-name').value||'Client'};
   for(var idx=0;idx<keys.length;idx++){
     var k=keys[idx];
@@ -920,7 +920,7 @@ function runDiag(){
     var worstLvl=worstSide==='L'?lvlL:lvlR;
     var d=DIAG_SHORT[k][worstLvl];
     html+='<div class="dcard"><div class="dcard-hd" data-cardtoggle="c-'+k+'"><h4>'+labels[k]+'</h4><span class="sev '+levSev(worstLvl)+'">'+levLabel(worstLvl)+'</span></div><div class="dcard-body" id="c-'+k+'">';
-    html+='<div class="bil-pair"><div class="bil-pair-side L"><div class="pn">&#9664; LEFT</div><div class="pv" style="color:'+levColor(lvlL)+'">'+L+'\u00B0</div><div style="font-size:9px;color:var(--dgray);margin-top:2px">'+levLabel(lvlL)+'</div></div><div class="bil-pair-side R"><div class="pn">RIGHT &#9654;</div><div class="pv" style="color:'+levColor(lvlR)+'">'+R+'\u00B0</div><div style="font-size:9px;color:var(--dgray);margin-top:2px">'+levLabel(lvlR)+'</div></div></div>';
+    html+='<div class="bil-pair"><div class="bil-pair-side L"><div class="pn">LEFT</div><div class="pv" style="color:'+levColor(lvlL)+'">'+L+' deg</div><div style="font-size:9px;color:var(--dgray);margin-top:2px">'+levLabel(lvlL)+'</div></div><div class="bil-pair-side R"><div class="pn">RIGHT</div><div class="pv" style="color:'+levColor(lvlR)+'">'+R+' deg</div><div style="font-size:9px;color:var(--dgray);margin-top:2px">'+levLabel(lvlR)+'</div></div></div>';
     html+='<p><strong style="color:var(--pink)">'+d.title+'</strong></p><p>'+d.text+'</p>';
     html+='<p style="font-size:11px;color:var(--dgray);margin-top:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Issues:</p><ul>';
     for(var j=0;j<d.issues.length;j++)html+='<li>'+d.issues[j]+'</li>';
@@ -929,11 +929,11 @@ function runDiag(){
     if(imb&&imb.lvl!=='ok'){
       var ii=IMBAL_INFO[k][imb.lvl];
       var weakSide=L>R?'RIGHT':'LEFT';
-      html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><p style="color:var(--gold)"><strong>&#9888; '+ii.title+'</strong></p><p>Difference: <strong>'+imb.diff+'\u00B0</strong>. The <strong>'+weakSide+'</strong> side is more restricted.</p><ul>';
+      html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><p style="color:var(--gold)"><strong>'+ii.title+'</strong></p><p>Difference: <strong>'+imb.diff+' deg</strong>. The <strong>'+weakSide+'</strong> side is more restricted.</p><ul>';
       for(var ji=0;ji<ii.issues.length;ji++)html+='<li>'+ii.issues[ji]+'</li>';
       html+='</ul></div>';
     }else if(L&&R){
-      html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><p style="color:var(--green)"><strong>&#10004; Bilateral Balance OK</strong></p></div>';
+      html+='<div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border)"><p style="color:var(--green)"><strong>Bilateral Balance OK</strong></p></div>';
     }
     html+='<div class="rec-box"><strong>Recommended</strong><p style="color:var(--pink);font-weight:700">'+d.pkg+'</p></div>';
     html+='</div></div>';
@@ -1023,7 +1023,7 @@ function exportDiagPDF(){
 }
 
 var INVOICE_TXT={
-  en:{invoice:'INVOICE',invoiceFor:'INVOICE FOR',number:'NUMBER',date:'DATE',description:'Description',qty:'Cant.',price:'Price',total:'TOTAL',thanks:'Thank you for your business!',footer:'CatholicFitPlans - Assisted Stretching'},
+  en:{invoice:'INVOICE',invoiceFor:'INVOICE FOR',number:'NUMBER',date:'DATE',description:'Description',qty:'Qty',price:'Price',total:'TOTAL',thanks:'Thank you for your business!',footer:'CatholicFitPlans - Assisted Stretching'},
   es:{invoice:'FACTURA',invoiceFor:'FACTURA PARA',number:'NUMERO',date:'FECHA',description:'Descripcion',qty:'Cant.',price:'Precio',total:'TOTAL',thanks:'Gracias por su preferencia!',footer:'CatholicFitPlans - Estiramiento Asistido'}
 };
 
@@ -1101,17 +1101,17 @@ function downloadInvoice(payment,client){
 }
 
 function emailInvoice(payment,client){
-  if(!client.email){alert('Client has no email address. Please edit the client and add an email.');return;}
+  if(!client.email){alert('Client has no email. Edit the client and add an email.');return;}
   var doc=generateInvoicePDF(payment,client);
   doc.save('Invoice-'+(payment.invoiceNumber||'INV0019')+'-'+(client.name||'').replace(/ /g,'_')+'.pdf');
   var lang=payment.language||'en';
   var subject,body;
   if(lang==='es'){
     subject='Factura CatholicFitPlans - '+payment.invoiceNumber;
-    body='Hola '+client.name+',\n\nAdjunto la factura '+payment.invoiceNumber+' por $'+Number(payment.amount||0).toFixed(2)+' correspondiente a tu paquete de estiramiento asistido.\n\nLa factura se descargo a tu computadora. Por favor adjuntala al enviar este correo.\n\nGracias por tu preferencia.\n\nCatholicFitPlans';
+    body='Hola '+client.name+', adjunto la factura '+payment.invoiceNumber+' por $'+Number(payment.amount||0).toFixed(2)+'. La factura se descargo a tu computadora. Por favor adjuntala al enviar este correo. Gracias por tu preferencia. CatholicFitPlans';
   }else{
     subject='CatholicFitPlans Invoice - '+payment.invoiceNumber;
-    body='Hello '+client.name+',\n\nAttached is invoice '+payment.invoiceNumber+' for $'+Number(payment.amount||0).toFixed(2)+' for your assisted stretching package.\n\nThe invoice was downloaded to your computer. Please attach it before sending this email.\n\nThank you for your business.\n\nCatholicFitPlans';
+    body='Hello '+client.name+', attached is invoice '+payment.invoiceNumber+' for $'+Number(payment.amount||0).toFixed(2)+'. The invoice was downloaded to your computer. Please attach it before sending this email. Thank you. CatholicFitPlans';
   }
   setTimeout(function(){
     window.location.href='mailto:'+encodeURIComponent(client.email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
@@ -1156,10 +1156,10 @@ function renderList(q){
       if(pkgStatus.status==='expired')alertBadge='<span class="alert-badge" style="background:#ef4444">RENEW</span>';
       else if(pkgStatus.status==='warning')alertBadge='<span class="alert-badge" style="background:#f97316">1 LEFT</span>';
     }
-    html+='<div class="cli'+(isActive?' on':'')+'" data-cid="'+esc(c.id)+'"><div class="cav">'+esc(initials(c.name))+'</div><div class="cinfo"><div class="cn">'+esc(c.name)+alertBadge+'</div><div class="cp">'+esc(pkg.label||'No package')+(pkgStatus?' &middot; '+pkgStatus.done+'/'+pkgStatus.total:'')+'</div></div></div>';
+    html+='<div class="cli'+(isActive?' on':'')+'" data-cid="'+esc(c.id)+'"><div class="cav">'+esc(initials(c.name))+'</div><div class="cinfo"><div class="cn">'+esc(c.name)+alertBadge+'</div><div class="cp">'+esc(pkg.label||'No package')+(pkgStatus?' - '+pkgStatus.done+'/'+pkgStatus.total:'')+'</div></div></div>';
   }
   $('cn').textContent=clients.length;
-  if(!count)$('list').innerHTML='<div class="empty-list">'+(clients.length?'No matches.':'No clients yet.<br/>Click <b>+ Add New Client</b>.')+'</div>';
+  if(!count)$('list').innerHTML='<div class="empty-list">'+(clients.length?'No matches.':'No clients yet. Click Add New Client.')+'</div>';
   else $('list').innerHTML=html;
 }
 
@@ -1172,11 +1172,11 @@ function bilatBox(label,key,L,R){
   var lvlR=Rn?getLevel(key,Rn):null;
   var imb=getImbalance(Ln,Rn);
   var diffPill='';
-  if(imb){var diffCls=imbCls(imb.lvl);var diffLbl=imbLabel(imb.lvl);diffPill='<div style="text-align:center"><span class="diff-pill '+diffCls+'">'+diffLbl+': &Delta;'+imb.diff+'\u00B0</span></div>';}
-  var html='<div class="bilbox"><h3>'+label+' &middot; Goal: '+goals[key]+'\u00B0</h3>';
+  if(imb){var diffCls=imbCls(imb.lvl);var diffLbl=imbLabel(imb.lvl);diffPill='<div style="text-align:center"><span class="diff-pill '+diffCls+'">'+diffLbl+': '+imb.diff+' deg</span></div>';}
+  var html='<div class="bilbox"><h3>'+label+' - Goal: '+goals[key]+' deg</h3>';
   html+='<div class="bilbox-grid">';
-  html+='<div class="bilval L"><div class="vn">&#9664; Left</div><div class="vv" style="color:'+(Ln?levColor(lvlL):'var(--dgray)')+'">'+(Ln?Ln+'\u00B0':'--')+'</div><div class="vlbl">'+(Ln?levLabel(lvlL):'No data')+'</div></div>';
-  html+='<div class="bilval R"><div class="vn">Right &#9654;</div><div class="vv" style="color:'+(Rn?levColor(lvlR):'var(--dgray)')+'">'+(Rn?Rn+'\u00B0':'--')+'</div><div class="vlbl">'+(Rn?levLabel(lvlR):'No data')+'</div></div>';
+  html+='<div class="bilval L"><div class="vn">Left</div><div class="vv" style="color:'+(Ln?levColor(lvlL):'var(--dgray)')+'">'+(Ln?Ln+' deg':'--')+'</div><div class="vlbl">'+(Ln?levLabel(lvlL):'No data')+'</div></div>';
+  html+='<div class="bilval R"><div class="vn">Right</div><div class="vv" style="color:'+(Rn?levColor(lvlR):'var(--dgray)')+'">'+(Rn?Rn+' deg':'--')+'</div><div class="vlbl">'+(Rn?levLabel(lvlR):'No data')+'</div></div>';
   html+='</div>'+diffPill+'</div>';
   return html;
 }
@@ -1195,26 +1195,26 @@ function renderDetail(id){
   if(meta)h+='<div class="dp">'+meta+'</div>';
   if(c.email)h+='<div class="dp">'+esc(c.email)+'</div>';
   if(c.phone)h+='<div class="dp">'+esc(c.phone)+'</div>';
-  h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'" type="button">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'" type="button">&#128465;</button></div></div>';
+  h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'" type="button">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'" type="button">Delete</button></div></div>';
 
   var pkgStatus=getPackageStatus(c);
   if(pkgStatus){
     if(pkgStatus.status==='expired'){
-      h+='<div class="alert-banner"><div class="alert-banner-icon">&#128276;</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+pkgStatus.done+'/'+pkgStatus.total+' sessions completed. Register payment to renew.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div>';
+      h+='<div class="alert-banner"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+pkgStatus.done+'/'+pkgStatus.total+' sessions completed. Register payment to renew.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div>';
     }else if(pkgStatus.status==='warning'){
-      h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">&#9888;</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+pkgStatus.done+'/'+pkgStatus.total+' completed. Schedule renewal soon.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div>';
+      h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+pkgStatus.done+'/'+pkgStatus.total+' completed. Schedule renewal soon.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div>';
     }else{
       h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)"><div style="display:flex;align-items:center;justify-content:space-between"><div><h3 style="color:var(--green);margin-bottom:0">Package Progress</h3><p style="font-size:13px;color:var(--lgray);margin-top:4px">'+pkgStatus.done+' of '+pkgStatus.total+' sessions completed</p></div><div style="font-size:24px;font-weight:900;color:var(--green)">'+pkgStatus.done+'/'+pkgStatus.total+'</div></div></div>';
     }
   }
 
-  h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'" type="button">&#128176; Register Payment & Generate Invoice</button>';
+  h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment and Generate Invoice</button>';
 
   if(cPay.length){
-    h+='<div class="sec">Payments &amp; Invoices ('+cPay.length+')</div>';
+    h+='<div class="sec">Payments and Invoices ('+cPay.length+')</div>';
     for(var pi=0;pi<cPay.length;pi++){
       var p=cPay[pi];
-      h+='<div class="pay"><div class="pay-info"><div class="pay-num">'+esc(p.invoiceNumber||'')+'</div><div class="pay-amt">$'+Number(p.amount||0).toFixed(2)+'</div><div class="pay-meta">'+fmtDate(p.date)+' &middot; '+esc(p.description||'')+'</div></div><div class="pay-btns"><button class="pay-btn-sm" data-paydl="'+esc(c.id)+'|'+esc(p.id)+'" type="button">PDF</button><button class="pay-btn-sm email" data-payem="'+esc(c.id)+'|'+esc(p.id)+'" type="button">Email</button><button class="pay-btn-sm del" data-paydel="'+esc(c.id)+'|'+esc(p.id)+'" type="button">&#128465;</button></div></div>';
+      h+='<div class="pay"><div class="pay-info"><div class="pay-num">'+esc(p.invoiceNumber||'')+'</div><div class="pay-amt">$'+Number(p.amount||0).toFixed(2)+'</div><div class="pay-meta">'+fmtDate(p.date)+' - '+esc(p.description||'')+'</div></div><div class="pay-btns"><button class="pay-btn-sm" data-paydl="'+esc(c.id)+'|'+esc(p.id)+'" type="button">PDF</button><button class="pay-btn-sm email" data-payem="'+esc(c.id)+'|'+esc(p.id)+'" type="button">Email</button><button class="pay-btn-sm del" data-paydel="'+esc(c.id)+'|'+esc(p.id)+'" type="button">X</button></div></div>';
     }
   }
 
@@ -1228,18 +1228,18 @@ function renderDetail(id){
     for(var mi=0;mi<cMeas.length;mi++){
       var e=cMeas[mi];
       h+='<div class="mh"><div class="mh-d">'+fmtDate(e.date);
-      h+='<button class="mh-rm" data-rmmeas="'+esc(c.id)+'|'+esc(e.id)+'" type="button">&#128465;</button></div>';
+      h+='<button class="mh-rm" data-rmmeas="'+esc(c.id)+'|'+esc(e.id)+'" type="button">X</button></div>';
       if(e.note)h+='<div style="font-size:10px;color:var(--violet);margin-bottom:6px">'+esc(e.note)+'</div>';
       h+='<div class="mh-grid">';
-      h+='<div class="mh-cell"><span class="mh-lbl">Hip L</span><span class="mh-val" style="color:#ec4899">'+(e.hipL!=null&&e.hipL!==''?e.hipL+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">Hip R</span><span class="mh-val" style="color:#8b5cf6">'+(e.hipR!=null&&e.hipR!==''?e.hipR+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">&Delta;</span><span class="mh-val">'+((e.hipL&&e.hipR)?Math.abs(parseInt(e.hipL)-parseInt(e.hipR))+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">Ham L</span><span class="mh-val" style="color:#ec4899">'+(e.hamL!=null&&e.hamL!==''?e.hamL+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">Ham R</span><span class="mh-val" style="color:#8b5cf6">'+(e.hamR!=null&&e.hamR!==''?e.hamR+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">&Delta;</span><span class="mh-val">'+((e.hamL&&e.hamR)?Math.abs(parseInt(e.hamL)-parseInt(e.hamR))+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">Quad L</span><span class="mh-val" style="color:#ec4899">'+(e.quadL!=null&&e.quadL!==''?e.quadL+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">Quad R</span><span class="mh-val" style="color:#8b5cf6">'+(e.quadR!=null&&e.quadR!==''?e.quadR+'\u00B0':'--')+'</span></div>';
-      h+='<div class="mh-cell"><span class="mh-lbl">&Delta;</span><span class="mh-val">'+((e.quadL&&e.quadR)?Math.abs(parseInt(e.quadL)-parseInt(e.quadR))+'\u00B0':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Hip L</span><span class="mh-val" style="color:#ec4899">'+(e.hipL!=null&&e.hipL!==''?e.hipL+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Hip R</span><span class="mh-val" style="color:#8b5cf6">'+(e.hipR!=null&&e.hipR!==''?e.hipR+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Diff</span><span class="mh-val">'+((e.hipL&&e.hipR)?Math.abs(parseInt(e.hipL)-parseInt(e.hipR))+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Ham L</span><span class="mh-val" style="color:#ec4899">'+(e.hamL!=null&&e.hamL!==''?e.hamL+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Ham R</span><span class="mh-val" style="color:#8b5cf6">'+(e.hamR!=null&&e.hamR!==''?e.hamR+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Diff</span><span class="mh-val">'+((e.hamL&&e.hamR)?Math.abs(parseInt(e.hamL)-parseInt(e.hamR))+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Quad L</span><span class="mh-val" style="color:#ec4899">'+(e.quadL!=null&&e.quadL!==''?e.quadL+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Quad R</span><span class="mh-val" style="color:#8b5cf6">'+(e.quadR!=null&&e.quadR!==''?e.quadR+' deg':'--')+'</span></div>';
+      h+='<div class="mh-cell"><span class="mh-lbl">Diff</span><span class="mh-val">'+((e.quadL&&e.quadR)?Math.abs(parseInt(e.quadL)-parseInt(e.quadR))+' deg':'--')+'</span></div>';
       h+='</div></div>';
     }
   }
@@ -1258,7 +1258,7 @@ function renderDetail(id){
   if(cSess.length){
     for(var si=0;si<cSess.length;si++){
       var ss=cSess[si];
-      h+='<div class="ses"><div class="ses-h" data-toggleses="'+si+'"><div><div class="ses-d">'+fmtDate(ss.date)+'</div><div class="ses-n">Session #'+esc(ss.num)+' \u00B7 '+esc(ss.duration)+'</div></div><span style="color:var(--dgray)">&#9660;</span></div><div class="ses-b" id="sb-'+si+'">';
+      h+='<div class="ses"><div class="ses-h" data-toggleses="'+si+'"><div><div class="ses-d">'+fmtDate(ss.date)+'</div><div class="ses-n">Session #'+esc(ss.num)+' - '+esc(ss.duration)+'</div></div><span style="color:var(--dgray)">v</span></div><div class="ses-b" id="sb-'+si+'">';
       if(ss.stretches)h+='<p style="font-size:12px;color:var(--lgray);white-space:pre-wrap;margin-bottom:8px"><b>Stretches:</b> '+esc(ss.stretches)+'</p>';
       if(ss.notes)h+='<p style="font-size:12px;color:var(--lgray);margin-bottom:8px"><b>Notes:</b> '+esc(ss.notes)+'</p>';
       h+='<div style="text-align:right"><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:0;border:0;color:var(--red);font-size:11px;cursor:pointer">Delete</button></div></div></div>';
