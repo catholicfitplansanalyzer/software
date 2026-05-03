@@ -231,7 +231,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
 </style>
 </head><body>
 
-<!-- LOGIN SCREEN -->
 <div class="login-screen on" id="login-screen">
   <div class="login-box" id="login-form">
     <div class="login-logo">&#10013;</div>
@@ -252,7 +251,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
       Don't have an account? <a id="show-register">Create one</a>
     </div>
   </div>
-  
+
   <div class="login-box" id="register-form" style="display:none">
     <div class="login-logo">&#128100;</div>
     <h1 class="login-title">Create Account</h1>
@@ -282,7 +281,6 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
-<!-- MAIN APP -->
 <div class="app-container" id="app-container">
 <header>
   <div class="header-top">
@@ -298,16 +296,15 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
         <b id="hdr-user-name">User</b>
         <span id="hdr-user-email"></span>
       </div>
-      <button class="logout-btn" id="logout-btn">Logout</button>
+      <button class="logout-btn" id="logout-btn" type="button">Logout</button>
     </div>
   </div>
   <div class="tabs">
-    <button class="tab on" data-tab="analyzer"><span class="ti">&#128104;</span> Body Analyzer</button>
-    <button class="tab" data-tab="agenda"><span class="ti">&#128203;</span> Client Agenda</button>
+    <button class="tab on" data-tab="analyzer" type="button"><span class="ti">&#128104;</span> Body Analyzer</button>
+    <button class="tab" data-tab="agenda" type="button"><span class="ti">&#128203;</span> Client Agenda</button>
   </div>
 </header>
 
-<!-- ANALYZER PANEL -->
 <div class="panel on" id="p-analyzer">
   <div class="analyzer">
     <div class="body-panel">
@@ -395,8 +392,8 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
         </div>
 
         <div class="btn-row">
-          <button class="analyze-btn" id="analyze-btn">&#9889; Analyze</button>
-          <button class="pdf-btn" id="pdf-btn" disabled>&#128196; PDF</button>
+          <button class="analyze-btn" id="analyze-btn" type="button">&#9889; Analyze</button>
+          <button class="pdf-btn" id="pdf-btn" disabled type="button">&#128196; PDF</button>
         </div>
       </div>
       <div class="diag-area">
@@ -412,14 +409,13 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
-<!-- AGENDA PANEL -->
 <div class="panel" id="p-agenda">
   <div class="layout">
     <aside class="side">
       <div class="side-h">
         <h2>Clients (<span id="cn">0</span>)</h2>
         <input class="search" id="search" placeholder="Search..."/>
-        <button class="add-btn" id="add-btn">+ Add New Client</button>
+        <button class="add-btn" id="add-btn" type="button">+ Add New Client</button>
       </div>
       <div class="list" id="list"></div>
     </aside>
@@ -434,11 +430,9 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
-</div>
-<!-- end app-container --><!-- CLIENT MODAL -->
-<div class="mo" id="m-cli">
+</div><div class="mo" id="m-cli">
   <div class="md">
-    <div class="md-h"><h2 id="m-cli-t">Add New Client</h2><button class="md-x" data-close="m-cli">&times;</button></div>
+    <div class="md-h"><h2 id="m-cli-t">Add New Client</h2><button class="md-x" data-close="m-cli" type="button">&times;</button></div>
     <div class="md-b">
       <input type="hidden" id="f-id"/>
       <div class="fg"><label>Full Name *</label><input class="fi" id="f-name" placeholder="Maria Garcia"/></div>
@@ -484,14 +478,13 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
       <div class="fg"><label>Stretching Protocol</label><textarea class="ft" id="f-str"></textarea></div>
       <div class="fg"><label>Notes</label><textarea class="ft" id="f-notes"></textarea></div>
     </div>
-    <div class="md-f"><button class="bc" data-close="m-cli">Cancel</button><button class="bs" id="b-save-cli">Save</button></div>
+    <div class="md-f"><button class="bc" data-close="m-cli" type="button">Cancel</button><button class="bs" id="b-save-cli" type="button">Save</button></div>
   </div>
 </div>
 
-<!-- MEAS MODAL -->
 <div class="mo" id="m-meas">
   <div class="md">
-    <div class="md-h"><h2>Update Measurements</h2><button class="md-x" data-close="m-meas">&times;</button></div>
+    <div class="md-h"><h2>Update Measurements</h2><button class="md-x" data-close="m-meas" type="button">&times;</button></div>
     <div class="md-b">
       <input type="hidden" id="mf-cid"/>
       <div class="fg"><label>Date</label><input class="fi" id="mf-date" type="date"/></div>
@@ -518,14 +511,13 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
       </div>
       <div class="fg"><label>Observation</label><input class="fi" id="mf-note"/></div>
     </div>
-    <div class="md-f"><button class="bc" data-close="m-meas">Cancel</button><button class="bs" id="b-save-meas">Save</button></div>
+    <div class="md-f"><button class="bc" data-close="m-meas" type="button">Cancel</button><button class="bs" id="b-save-meas" type="button">Save</button></div>
   </div>
 </div>
 
-<!-- SESSION MODAL -->
 <div class="mo" id="m-ses">
   <div class="md">
-    <div class="md-h"><h2>Add Session</h2><button class="md-x" data-close="m-ses">&times;</button></div>
+    <div class="md-h"><h2>Add Session</h2><button class="md-x" data-close="m-ses" type="button">&times;</button></div>
     <div class="md-b">
       <input type="hidden" id="sf-cid"/>
       <div class="fr">
@@ -536,14 +528,13 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
       <div class="fg"><label>Stretches Performed</label><textarea class="ft" id="sf-str"></textarea></div>
       <div class="fg"><label>Notes</label><textarea class="ft" id="sf-notes"></textarea></div>
     </div>
-    <div class="md-f"><button class="bc" data-close="m-ses">Cancel</button><button class="bs" id="b-save-ses">Save</button></div>
+    <div class="md-f"><button class="bc" data-close="m-ses" type="button">Cancel</button><button class="bs" id="b-save-ses" type="button">Save</button></div>
   </div>
 </div>
 
-<!-- PAYMENT MODAL -->
 <div class="mo" id="m-pay">
   <div class="md">
-    <div class="md-h"><h2>Register Payment & Generate Invoice</h2><button class="md-x" data-close="m-pay">&times;</button></div>
+    <div class="md-h"><h2>Register Payment & Generate Invoice</h2><button class="md-x" data-close="m-pay" type="button">&times;</button></div>
     <div class="md-b">
       <input type="hidden" id="pf-cid"/>
       <div class="fr2">
@@ -574,13 +565,12 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
         <b>&#10004; Auto:</b> Saving will renew the package, reset session counter, and generate invoice PDF.
       </div>
     </div>
-    <div class="md-f"><button class="bc" data-close="m-pay">Cancel</button><button class="bs" id="b-save-pay">Save & Generate Invoice</button></div>
+    <div class="md-f"><button class="bc" data-close="m-pay" type="button">Cancel</button><button class="bs" id="b-save-pay" type="button">Save & Generate Invoice</button></div>
   </div>
 </div>
 
 <div class="toast" id="toast"></div><script>
 (function(){
-// ===== GOOGLE SHEETS API =====
 var API_URL='https://script.google.com/macros/s/AKfycbzbucBRUHtxAwQi6__Q45uu5Eacdkg35tdDiRaejzRby5g1Q9HZriRZR9HHfr2IrWuEdg/exec';
 var clients=[],sessions={},meas={},payments={},users=[];
 var currentUser=null;
@@ -604,7 +594,6 @@ function normalizeRecord(r){
   return out;
 }
 
-// ===== LOGIN SYSTEM =====
 async function hashPassword(p){
   var enc=new TextEncoder().encode(p+'cfp_salt_2025');
   var buf=await crypto.subtle.digest('SHA-256',enc);
@@ -676,7 +665,7 @@ async function attemptRegister(){
     var data=await res.json();
     hideLoader();
     if(!data.success){showRegErr(data.error||'Could not create account');return;}
-    showRegSuc('Account created! Awaiting admin approval. You will be notified when activated.');
+    showRegSuc('Account created! Awaiting admin approval.');
     document.getElementById('reg-name').value='';
     document.getElementById('reg-email').value='';
     document.getElementById('reg-pwd').value='';
@@ -757,7 +746,6 @@ function switchTab(name){
   document.getElementById('p-agenda').classList.toggle('on',name==='agenda');
 }
 
-// ===== BODY SVG =====
 var diagRun=false;
 function getLevel(k,v){
   if(k==='hip')return v<45?'crit':v<70?'mod':v<90?'mild':'good';
@@ -879,19 +867,18 @@ function refreshAnalyzerInputs(){
     updateImbalanceWarn(keys[i]);
   }
   updateImbalanceSummary();
-}// ===== DIAGNOSIS =====
-var DIAG_SHORT={
+}var DIAG_SHORT={
   hip:{
     crit:{title:'Severe Hip Restriction',text:'Iliopsoas very tight, causing chronic low back pain.',issues:['Chronic low back pain','Forward-tilted pelvis','Hip impingement','Weak glutes'],pkg:'Elite - 12 sessions/month'},
     mod:{title:'Moderate Hip Restriction',text:'Significant hip flexor tightness from prolonged sitting.',issues:['Lower back stiffness','Hunched posture','Short stride length'],pkg:'Intensive - 8 sessions/month'},
     mild:{title:'Mild Hip Restriction',text:'Below goal but close. Achievable with consistent sessions.',issues:['Minor back fatigue','Shallow squat depth'],pkg:'Basic - 4 sessions/month'},
-    good:{title:'Excellent Hip Mobility',text:'Hip flexion meets the 90° goal. Iliopsoas works well.',issues:['Maintain mobility','Watch for asymmetry'],pkg:'Maintenance - 2 sessions/month'}
+    good:{title:'Excellent Hip Mobility',text:'Hip flexion meets the 90 deg goal. Iliopsoas works well.',issues:['Maintain mobility','Watch for asymmetry'],pkg:'Maintenance - 2 sessions/month'}
   },
   ham:{
     crit:{title:'Severe Hamstring Restriction',text:'Hamstrings pulling on sacrum, causing sciatic nerve tension.',issues:['Sciatic pain','Disc compression','Knee hyperextension'],pkg:'Elite - 12 sessions/month'},
     mod:{title:'Moderate Hamstring Restriction',text:'Restricted posterior chain causing lumbar strain.',issues:['Lower back tightness','Rounded back when bending','Reduced running performance'],pkg:'Intensive - 8 sessions/month'},
     mild:{title:'Mild Hamstring Restriction',text:'Approaching goal. Reachable in 4-8 weeks.',issues:['Slight running fatigue','Limited forward bending'],pkg:'Basic - 4 sessions/month'},
-    good:{title:'Excellent Hamstring Mobility',text:'Hamstrings meet 90° goal. Posterior chain optimal.',issues:['Maintain to prevent regression'],pkg:'Maintenance - 2 sessions/month'}
+    good:{title:'Excellent Hamstring Mobility',text:'Hamstrings meet 90 deg goal. Posterior chain optimal.',issues:['Maintain to prevent regression'],pkg:'Maintenance - 2 sessions/month'}
   },
   quad:{
     crit:{title:'Severe Quad Restriction',text:'Severely limits squatting; causes patellar compression.',issues:['Patellar pain syndrome','Cannot squat properly','Knee pain on stairs'],pkg:'Elite - 12 sessions/month'},
@@ -1035,7 +1022,6 @@ function exportDiagPDF(){
   doc.save('Diagnosis-'+d.clientName.replace(/ /g,'_')+'-'+new Date().toISOString().split('T')[0]+'.pdf');
 }
 
-// ===== INVOICE PDF =====
 var INVOICE_TXT={
   en:{invoice:'INVOICE',invoiceFor:'INVOICE FOR',number:'NUMBER',date:'DATE',description:'Description',qty:'Cant.',price:'Price',total:'TOTAL',thanks:'Thank you for your business!',footer:'CatholicFitPlans - Assisted Stretching'},
   es:{invoice:'FACTURA',invoiceFor:'FACTURA PARA',number:'NUMERO',date:'FECHA',description:'Descripcion',qty:'Cant.',price:'Precio',total:'TOTAL',thanks:'Gracias por su preferencia!',footer:'CatholicFitPlans - Estiramiento Asistido'}
@@ -1047,20 +1033,15 @@ function generateInvoicePDF(payment,client){
   var pageW=210,margin=15;
   var lang=payment.language||'en';
   var t=INVOICE_TXT[lang];
-  // Black header background top section
   doc.setFillColor(11,10,30);doc.rect(0,0,pageW,75,'F');
-  // Logo circle
   doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');
   doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');
   doc.text('+',pageW/2,35,{align:'center'});
-  // Title
   doc.setFontSize(28);doc.setTextColor(236,72,153);doc.setFont(undefined,'bold');
   doc.text(t.invoice,pageW/2,58,{align:'center'});
-  // Date below
   doc.setFontSize(10);doc.setTextColor(167,139,250);doc.setFont(undefined,'normal');
   var dateStr=formatInvoiceDate(payment.date,lang);
   doc.text(dateStr,pageW/2,68,{align:'center'});
-  // Client info section
   var y=90;
   doc.setTextColor(0,0,0);doc.setFontSize(11);doc.setFont(undefined,'bold');
   doc.text(t.invoiceFor+': '+(client.name||'').toUpperCase(),margin,y);
@@ -1070,14 +1051,12 @@ function generateInvoicePDF(payment,client){
   if(client.email){doc.text(client.email,margin,y);}
   doc.text(t.date+': '+dateStr,pageW-margin,y,{align:'right'});
   y+=15;
-  // Table header
   doc.setFillColor(30,28,74);doc.rect(margin,y-5,pageW-margin*2,9,'F');
   doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');doc.setFontSize(11);
   doc.text(t.description,margin+3,y);
   doc.text(t.qty,margin+115,y);
   doc.text(t.price,pageW-margin-3,y,{align:'right'});
   y+=12;
-  // Row
   doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');doc.setFontSize(10);
   var desc=payment.description||(payment.sessions+' Sessions x 30 mins');
   doc.text(desc,margin+3,y);
@@ -1086,7 +1065,6 @@ function generateInvoicePDF(payment,client){
   y+=6;
   doc.setDrawColor(220,220,220);doc.line(margin,y,pageW-margin,y);
   y+=4;
-  // Notes
   if(payment.notes){
     y+=5;
     doc.setFontSize(9);doc.setTextColor(100,100,100);doc.setFont(undefined,'italic');
@@ -1094,14 +1072,12 @@ function generateInvoicePDF(payment,client){
     doc.text(noteLines,margin+3,y);
     y+=noteLines.length*4+5;
   }
-  // Total
   y=Math.max(y+30,200);
   doc.setFillColor(245,243,255);doc.rect(margin+90,y-5,pageW-margin-90,12,'F');
   doc.setTextColor(0,0,0);doc.setFont(undefined,'bold');doc.setFontSize(13);
   doc.text(t.total+':',margin+95,y+2);
   doc.setTextColor(236,72,153);
   doc.text('$'+Number(payment.amount||0).toFixed(2),pageW-margin-3,y+2,{align:'right'});
-  // Footer
   doc.setTextColor(139,92,246);doc.setFont(undefined,'italic');doc.setFontSize(11);
   doc.text(t.thanks,pageW/2,y+25,{align:'center'});
   doc.setTextColor(150,150,150);doc.setFont(undefined,'normal');doc.setFontSize(8);
@@ -1140,8 +1116,7 @@ function emailInvoice(payment,client){
   setTimeout(function(){
     window.location.href='mailto:'+encodeURIComponent(client.email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
   },500);
-}// ===== AGENDA =====
-var activeId=null;
+}var activeId=null;
 var PKG={elite:{label:'Elite - 12/mo',cls:'pk-elite',price:480,sessions:12},intensive:{label:'Intensive - 8/mo',cls:'pk-intensive',price:360,sessions:8},basic:{label:'Basic - 4/mo',cls:'pk-basic',price:200,sessions:4},maintenance:{label:'Maintenance - 2/mo',cls:'pk-maintenance',price:120,sessions:2}};
 function $(id){return document.getElementById(id);}
 function findClient(id){var s=String(id);for(var i=0;i<clients.length;i++)if(String(clients[i].id)===s)return clients[i];return null;}
@@ -1220,30 +1195,30 @@ function renderDetail(id){
   if(meta)h+='<div class="dp">'+meta+'</div>';
   if(c.email)h+='<div class="dp">'+esc(c.email)+'</div>';
   if(c.phone)h+='<div class="dp">'+esc(c.phone)+'</div>';
-  h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'">&#128465;</button></div></div>';
+  h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'" type="button">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'" type="button">&#128465;</button></div></div>';
 
   var pkgStatus=getPackageStatus(c);
   if(pkgStatus){
     if(pkgStatus.status==='expired'){
-      h+='<div class="alert-banner"><div class="alert-banner-icon">&#128276;</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+pkgStatus.done+'/'+pkgStatus.total+' sessions completed. Register payment to renew.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'">Register Payment</button></div>';
+      h+='<div class="alert-banner"><div class="alert-banner-icon">&#128276;</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+pkgStatus.done+'/'+pkgStatus.total+' sessions completed. Register payment to renew.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div>';
     }else if(pkgStatus.status==='warning'){
-      h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">&#9888;</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+pkgStatus.done+'/'+pkgStatus.total+' completed. Schedule renewal soon.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'">Renew Now</button></div>';
+      h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">&#9888;</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+pkgStatus.done+'/'+pkgStatus.total+' completed. Schedule renewal soon.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div>';
     }else{
       h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)"><div style="display:flex;align-items:center;justify-content:space-between"><div><h3 style="color:var(--green);margin-bottom:0">Package Progress</h3><p style="font-size:13px;color:var(--lgray);margin-top:4px">'+pkgStatus.done+' of '+pkgStatus.total+' sessions completed</p></div><div style="font-size:24px;font-weight:900;color:var(--green)">'+pkgStatus.done+'/'+pkgStatus.total+'</div></div></div>';
     }
   }
 
-  h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'">&#128176; Register Payment & Generate Invoice</button>';
+  h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'" type="button">&#128176; Register Payment & Generate Invoice</button>';
 
   if(cPay.length){
     h+='<div class="sec">Payments &amp; Invoices ('+cPay.length+')</div>';
     for(var pi=0;pi<cPay.length;pi++){
       var p=cPay[pi];
-      h+='<div class="pay"><div class="pay-info"><div class="pay-num">'+esc(p.invoiceNumber||'')+'</div><div class="pay-amt">$'+Number(p.amount||0).toFixed(2)+'</div><div class="pay-meta">'+fmtDate(p.date)+' &middot; '+esc(p.description||'')+'</div></div><div class="pay-btns"><button class="pay-btn-sm" data-paydl="'+esc(c.id)+'|'+esc(p.id)+'">PDF</button><button class="pay-btn-sm email" data-payem="'+esc(c.id)+'|'+esc(p.id)+'">Email</button><button class="pay-btn-sm del" data-paydel="'+esc(c.id)+'|'+esc(p.id)+'">&#128465;</button></div></div>';
+      h+='<div class="pay"><div class="pay-info"><div class="pay-num">'+esc(p.invoiceNumber||'')+'</div><div class="pay-amt">$'+Number(p.amount||0).toFixed(2)+'</div><div class="pay-meta">'+fmtDate(p.date)+' &middot; '+esc(p.description||'')+'</div></div><div class="pay-btns"><button class="pay-btn-sm" data-paydl="'+esc(c.id)+'|'+esc(p.id)+'" type="button">PDF</button><button class="pay-btn-sm email" data-payem="'+esc(c.id)+'|'+esc(p.id)+'" type="button">Email</button><button class="pay-btn-sm del" data-paydel="'+esc(c.id)+'|'+esc(p.id)+'" type="button">&#128465;</button></div></div>';
     }
   }
 
-  h+='<div class="sec">Bilateral Measurements <button data-meas="'+esc(c.id)+'">+ Update</button></div>';
+  h+='<div class="sec">Bilateral Measurements <button data-meas="'+esc(c.id)+'" type="button">+ Update</button></div>';
   h+=bilatBox('Hip Flexion','hip',c.hipL,c.hipR);
   h+=bilatBox('Hamstring','ham',c.hamL,c.hamR);
   h+=bilatBox('Quadriceps','quad',c.quadL,c.quadR);
@@ -1253,7 +1228,7 @@ function renderDetail(id){
     for(var mi=0;mi<cMeas.length;mi++){
       var e=cMeas[mi];
       h+='<div class="mh"><div class="mh-d">'+fmtDate(e.date);
-      h+='<button class="mh-rm" data-rmmeas="'+esc(c.id)+'|'+esc(e.id)+'">&#128465;</button></div>';
+      h+='<button class="mh-rm" data-rmmeas="'+esc(c.id)+'|'+esc(e.id)+'" type="button">&#128465;</button></div>';
       if(e.note)h+='<div style="font-size:10px;color:var(--violet);margin-bottom:6px">'+esc(e.note)+'</div>';
       h+='<div class="mh-grid">';
       h+='<div class="mh-cell"><span class="mh-lbl">Hip L</span><span class="mh-val" style="color:#ec4899">'+(e.hipL!=null&&e.hipL!==''?e.hipL+'\u00B0':'--')+'</span></div>';
@@ -1279,14 +1254,14 @@ function renderDetail(id){
   else h+='<p style="font-size:12px;color:var(--dgray);font-style:italic">No protocol defined</p>';
   h+='</div>';
   if(c.notes)h+='<div class="box" style="margin-top:14px"><h3>Notes</h3><p style="font-size:13px;color:var(--lgray);white-space:pre-wrap">'+esc(c.notes)+'</p></div>';
-  h+='<div class="sec">Sessions ('+cSess.length+') <button data-addses="'+esc(c.id)+'">+ Add Session</button></div>';
+  h+='<div class="sec">Sessions ('+cSess.length+') <button data-addses="'+esc(c.id)+'" type="button">+ Add Session</button></div>';
   if(cSess.length){
     for(var si=0;si<cSess.length;si++){
       var ss=cSess[si];
       h+='<div class="ses"><div class="ses-h" data-toggleses="'+si+'"><div><div class="ses-d">'+fmtDate(ss.date)+'</div><div class="ses-n">Session #'+esc(ss.num)+' \u00B7 '+esc(ss.duration)+'</div></div><span style="color:var(--dgray)">&#9660;</span></div><div class="ses-b" id="sb-'+si+'">';
       if(ss.stretches)h+='<p style="font-size:12px;color:var(--lgray);white-space:pre-wrap;margin-bottom:8px"><b>Stretches:</b> '+esc(ss.stretches)+'</p>';
       if(ss.notes)h+='<p style="font-size:12px;color:var(--lgray);margin-bottom:8px"><b>Notes:</b> '+esc(ss.notes)+'</p>';
-      h+='<div style="text-align:right"><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" style="background:0;border:0;color:var(--red);font-size:11px;cursor:pointer">Delete</button></div></div></div>';
+      h+='<div style="text-align:right"><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:0;border:0;color:var(--red);font-size:11px;cursor:pointer">Delete</button></div></div></div>';
     }
   }else h+='<div style="text-align:center;padding:20px;color:var(--dgray);font-size:12px">No sessions yet.</div>';
   $('detail').innerHTML=h;
@@ -1365,7 +1340,6 @@ function saveSes(){
 }
 function delSes(cid,sid){if(!confirm('Delete?'))return;var ss=String(sid),arr=sessions[cid]||[],n=[];for(var i=0;i<arr.length;i++)if(String(arr[i].id)!==ss)n.push(arr[i]);sessions[cid]=n;saveAll();renderDetail(cid);}
 
-// ===== PAYMENTS =====
 function openPay(id){
   var c=findClient(id);if(!c)return;
   if(!c.email){if(!confirm('Client has no email. Continue anyway?'))return;}
@@ -1412,7 +1386,6 @@ function savePay(){
     notes:$('pf-notes').value
   };
   if(!payments[cid])payments[cid]=[];payments[cid].push(pay);
-  // Auto-renew package
   var idx=findIdx(cid);
   if(idx>=0){
     clients[idx].package=$('pf-pkg').value;
@@ -1420,7 +1393,6 @@ function savePay(){
   }
   saveAll();
   closeModal('m-pay');
-  // Generate invoice
   var clientUpdated=findClient(cid);
   if(confirm('Payment saved! Send invoice by email now?')){
     emailInvoice(pay,clientUpdated);
@@ -1435,7 +1407,6 @@ function downloadPay(cid,pid){var p=findPayment(cid,pid);var c=findClient(cid);i
 function emailPay(cid,pid){var p=findPayment(cid,pid);var c=findClient(cid);if(p&&c)emailInvoice(p,c);}
 function delPay(cid,pid){if(!confirm('Delete payment?'))return;var sp=String(pid),arr=payments[cid]||[],n=[];for(var i=0;i<arr.length;i++)if(String(arr[i].id)!==sp)n.push(arr[i]);payments[cid]=n;saveAll();renderDetail(cid);}
 
-// ===== EVENT DELEGATION =====
 document.addEventListener('click',function(ev){
   var t=ev.target;
   while(t&&t!==document.body){
@@ -1485,12 +1456,9 @@ for(var bi=0;bi<bilatInputs.length;bi++){
 }
 document.getElementById('search').addEventListener('input',function(){renderList(document.getElementById('search').value);});
 
-// ===== INIT =====
 renderBody();
 refreshAnalyzerInputs();
-if(!checkSession()){
-  // Show login screen (already shown by default)
-}
+checkSession();
 
 })();
 </script>
