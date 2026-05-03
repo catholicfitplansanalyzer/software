@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head><title>Generador de Hash</title>
+<style>
+body{font-family:sans-serif;background:#0b0a1e;color:#fff;padding:30px;max-width:500px;margin:0 auto}
+input{width:100%;padding:12px;font-size:16px;border-radius:8px;border:1px solid #444;background:#1e1c4a;color:#fff;margin:10px 0}
+button{width:100%;padding:14px;background:#ec4899;color:#fff;border:0;border-radius:8px;font-size:16px;font-weight:bold;cursor:pointer;margin-top:10px}
+.result{background:#1e1c4a;padding:16px;border-radius:8px;margin-top:20px;word-break:break-all;font-family:monospace;font-size:13px;border:2px solid #34d399;display:none}
+.copy{background:#34d399;margin-top:10px}
+h2{color:#ec4899}
+</style>
+</head>
+<body>
+<h2>🔐 Generar Hash de Contraseña</h2>
+<p>Escribe tu contraseña y dale al botón.</p>
+<input type="text" id="pwd" placeholder="Tu contraseña aquí" autofocus/>
+<button onclick="gen()">Generar Hash</button>
+<div class="result" id="res"></div>
+<button class="copy" onclick="cp()" id="cb" style="display:none">Copiar Hash</button>
+<script>
+async function gen(){
+  var p=document.getElementById('pwd').value;
+  if(!p){alert('Escribe una contraseña');return;}
+  var e=new TextEncoder().encode(p+'cfp_salt_2025');
+  var b=await crypto.subtle.digest('SHA-256',e);
+  var h=Array.from(new Uint8Array(b)).map(function(x){return x.toString(16).padStart(2,'0');}).join('');
+  document.getElementById('res').textContent=h;
+  document.getElementById('res').style.display='block';
+  document.getElementById('cb').style.display='block';
+  window.lastHash=h;
+}
+function cp(){
+  navigator.clipboard.writeText(window.lastHash);
+  alert('¡Copiado!');
+}
+</script>
+</body>
+</html>
