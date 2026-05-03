@@ -10,6 +10,26 @@
 *{box-sizing:border-box;margin:0;padding:0}
 :root{--bg:#0b0a1e;--surface:#111029;--card:#181640;--card2:#1e1c4a;--border:#252350;--border2:#302d6e;--pink:#ec4899;--violet:#8b5cf6;--teal:#2dd4bf;--gold:#fbbf24;--orange:#f97316;--red:#ef4444;--green:#34d399;--lgray:#c4b5d8;--mgray:#9585b8;--dgray:#5c5280}
 body{background:var(--bg);color:#fff;font-family:Outfit,sans-serif;min-height:100vh;overflow-x:hidden}
+.login-screen{position:fixed;inset:0;background:linear-gradient(135deg,#0b0a1e 0%,#1a0f2e 100%);z-index:9999;display:flex;align-items:center;justify-content:center;padding:20px}
+.login-box{background:var(--card);border:1px solid var(--border2);border-radius:20px;padding:40px 32px;width:100%;max-width:420px;box-shadow:0 20px 60px rgba(0,0,0,0.5)}
+.login-logo{width:70px;height:70px;border-radius:50%;background:linear-gradient(135deg,var(--pink),var(--violet));margin:0 auto 20px;display:grid;place-items:center;font-size:32px}
+.login-title{font-family:'DM Serif Display',serif;font-size:26px;text-align:center;margin-bottom:6px}
+.login-title b{color:var(--pink)}
+.login-title i{color:#a78bfa;font-style:normal}
+.login-sub{text-align:center;font-size:11px;color:var(--dgray);letter-spacing:.14em;text-transform:uppercase;margin-bottom:28px}
+.login-fg{margin-bottom:14px}
+.login-fg label{display:block;font-size:10px;font-weight:700;color:var(--lgray);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.login-fi{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:#fff;font-family:Outfit;font-size:14px;outline:none}
+.login-fi:focus{border-color:var(--violet)}
+.login-btn{width:100%;padding:14px;background:linear-gradient(135deg,var(--pink),var(--violet));border:0;border-radius:10px;color:#fff;font-family:Outfit;font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;margin-top:8px}
+.login-link{text-align:center;margin-top:18px;font-size:12px;color:var(--mgray)}
+.login-link a{color:var(--pink);text-decoration:none;font-weight:700;cursor:pointer}
+.login-error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.4);border-radius:8px;padding:10px;margin-bottom:14px;color:#fca5a5;font-size:12px;display:none}
+.login-error.on{display:block}
+.login-success{background:rgba(52,211,153,.12);border:1px solid rgba(52,211,153,.4);border-radius:8px;padding:10px;margin-bottom:14px;color:#86efac;font-size:12px;display:none}
+.login-success.on{display:block}
+.app-container{display:none}
+.app-container.on{display:block}
 header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bottom:1px solid var(--border)}
 .header-top{display:flex;align-items:center;justify-content:space-between;padding:14px 24px}
 .brand{display:flex;align-items:center;gap:12px}
@@ -17,7 +37,10 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
 .bname{font-family:'DM Serif Display',serif;font-size:19px}
 .bname b{color:var(--pink)}.bname i{color:#a78bfa;font-style:normal}
 .bsub{font-size:9px;color:var(--dgray);letter-spacing:.14em;text-transform:uppercase;margin-top:2px}
-.bpill{padding:6px 14px;border-radius:20px;font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;background:linear-gradient(135deg,var(--pink),var(--violet))}
+.header-right{display:flex;align-items:center;gap:12px}
+.user-info{font-size:11px;color:var(--lgray);text-align:right}
+.user-info b{display:block;color:#fff;font-size:13px}
+.logout-btn{padding:8px 14px;background:transparent;border:1px solid var(--red);border-radius:8px;color:var(--red);font-family:Outfit;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.06em}
 .tabs{display:flex;border-top:1px solid var(--border);padding:0 24px}
 .tab{flex:1;padding:14px 18px;background:transparent;border:0;color:var(--mgray);font-family:Outfit;font-size:13px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;cursor:pointer;position:relative;display:flex;align-items:center;justify-content:center;gap:8px}
 .tab .ti{font-size:16px}
@@ -111,9 +134,16 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
 .cli.on{background:rgba(236,72,153,.1);border-right:3px solid var(--pink)}
 .cav{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--violet),var(--pink));display:grid;place-items:center;font-size:14px;font-weight:800;flex-shrink:0}
 .cinfo{flex:1;min-width:0}
-.cn{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cn{font-size:13px;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;display:flex;align-items:center}
 .cp{font-size:10px;color:var(--dgray);margin-top:1px}
 .empty-list{padding:24px;text-align:center;color:var(--dgray);font-size:12px;line-height:1.7}
+.alert-badge{display:inline-block;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:6px;letter-spacing:.05em;animation:pulse 1.5s ease-in-out infinite}
+.alert-banner{background:rgba(239,68,68,.15);border:1px solid var(--red);border-left:4px solid var(--red);border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
+.alert-banner-icon{font-size:24px}
+.alert-banner-text{flex:1}
+.alert-banner-text h4{color:var(--red);font-size:13px;font-weight:800;margin-bottom:2px}
+.alert-banner-text p{font-size:11px;color:#fca5a5}
+.renew-btn{padding:8px 14px;background:var(--red);border:0;border-radius:8px;color:#fff;font-family:Outfit;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
 .main{overflow-y:auto;max-height:calc(100vh - 140px)}
 .empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 20px;color:var(--dgray);text-align:center}
 .empty .ei{font-size:48px;margin-bottom:12px;opacity:.3}
@@ -165,6 +195,16 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
 .ses-n{font-size:10px;color:var(--dgray);margin-top:1px}
 .ses-b{display:none;padding:10px 12px;border-top:1px solid var(--border)}
 .ses-b.on{display:block}
+.pay{background:var(--card2);border:1px solid var(--border);border-radius:10px;padding:12px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap}
+.pay-info{flex:1;min-width:140px}
+.pay-num{font-size:10px;font-weight:700;color:var(--violet);letter-spacing:.05em}
+.pay-amt{font-size:18px;font-weight:900;color:var(--green);margin-top:2px}
+.pay-meta{font-size:10px;color:var(--dgray);margin-top:2px}
+.pay-btns{display:flex;gap:6px;flex-wrap:wrap}
+.pay-btn-sm{padding:6px 10px;background:var(--card);border:1px solid var(--violet);border-radius:6px;color:#a78bfa;font-family:Outfit;font-size:10px;font-weight:700;cursor:pointer}
+.pay-btn-sm.email{border-color:var(--green);color:var(--green)}
+.pay-btn-sm.del{border-color:rgba(239,68,68,.3);color:var(--red)}
+.add-pay-btn{width:100%;padding:12px;background:linear-gradient(135deg,var(--green),#059669);border:0;border-radius:10px;color:#fff;font-family:Outfit;font-size:13px;font-weight:700;cursor:pointer;margin-bottom:10px;display:flex;align-items:center;justify-content:center;gap:8px}
 .mo{display:none;position:fixed;inset:0;background:rgba(5,4,20,.85);z-index:1000;align-items:center;justify-content:center;padding:14px}
 .mo.on{display:flex}
 .md{background:var(--card);border:1px solid var(--border2);border-radius:14px;width:100%;max-width:560px;max-height:92vh;overflow-y:auto}
@@ -187,15 +227,63 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
 .toast{position:fixed;bottom:20px;right:20px;background:var(--card2);border:1px solid var(--green);border-radius:10px;padding:10px 18px;font-size:12px;color:var(--green);font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s;z-index:2000}
 .toast.on{transform:translateY(0);opacity:1}
 @keyframes pulse{0%,100%{opacity:1}50%{opacity:.55}}
-.muscle-pulse{animation:pulse 1.5s ease-in-out infinite}.alert-badge{display:inline-block;background:#ef4444;color:#fff;font-size:8px;font-weight:800;padding:2px 6px;border-radius:6px;margin-left:6px;letter-spacing:.05em;animation:pulse 1.5s ease-in-out infinite}
-.alert-banner{background:rgba(239,68,68,.15);border:1px solid var(--red);border-left:4px solid var(--red);border-radius:10px;padding:14px 18px;margin-bottom:18px;display:flex;align-items:center;gap:14px}
-.alert-banner-icon{font-size:24px}
-.alert-banner-text{flex:1}
-.alert-banner-text h4{color:var(--red);font-size:13px;font-weight:800;margin-bottom:2px}
-.alert-banner-text p{font-size:11px;color:#fca5a5}
-.renew-btn{padding:8px 14px;background:var(--red);border:0;border-radius:8px;color:#fff;font-family:Outfit;font-size:11px;font-weight:700;cursor:pointer;text-transform:uppercase;letter-spacing:.05em}
+.muscle-pulse{animation:pulse 1.5s ease-in-out infinite}
 </style>
 </head><body>
+
+<!-- LOGIN SCREEN -->
+<div class="login-screen on" id="login-screen">
+  <div class="login-box" id="login-form">
+    <div class="login-logo">&#10013;</div>
+    <h1 class="login-title"><b>CatholicFit</b><i>Plans</i></h1>
+    <div class="login-sub">Sign In to Continue</div>
+    <div class="login-error" id="login-err"></div>
+    <div class="login-success" id="login-suc"></div>
+    <div class="login-fg">
+      <label>Email</label>
+      <input class="login-fi" id="login-email" type="email" autocomplete="email"/>
+    </div>
+    <div class="login-fg">
+      <label>Password</label>
+      <input class="login-fi" id="login-pwd" type="password" autocomplete="current-password"/>
+    </div>
+    <button class="login-btn" id="login-btn">Sign In</button>
+    <div class="login-link">
+      Don't have an account? <a id="show-register">Create one</a>
+    </div>
+  </div>
+
+  <div class="login-box" id="register-form" style="display:none">
+    <div class="login-logo">&#128100;</div>
+    <h1 class="login-title">Create Account</h1>
+    <div class="login-sub">Account requires admin approval</div>
+    <div class="login-error" id="reg-err"></div>
+    <div class="login-success" id="reg-suc"></div>
+    <div class="login-fg">
+      <label>Full Name</label>
+      <input class="login-fi" id="reg-name" type="text"/>
+    </div>
+    <div class="login-fg">
+      <label>Email</label>
+      <input class="login-fi" id="reg-email" type="email"/>
+    </div>
+    <div class="login-fg">
+      <label>Password (min 6 characters)</label>
+      <input class="login-fi" id="reg-pwd" type="password"/>
+    </div>
+    <div class="login-fg">
+      <label>Confirm Password</label>
+      <input class="login-fi" id="reg-pwd2" type="password"/>
+    </div>
+    <button class="login-btn" id="reg-btn">Create Account</button>
+    <div class="login-link">
+      Already have an account? <a id="show-login">Sign in</a>
+    </div>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div class="app-container" id="app-container">
 <header>
   <div class="header-top">
     <div class="brand">
@@ -205,7 +293,13 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
         <div class="bsub">Bilateral Body & Client Manager</div>
       </div>
     </div>
-    <div class="bpill">All-In-One</div>
+    <div class="header-right">
+      <div class="user-info">
+        <b id="hdr-user-name">User</b>
+        <span id="hdr-user-email"></span>
+      </div>
+      <button class="logout-btn" id="logout-btn">Logout</button>
+    </div>
   </div>
   <div class="tabs">
     <button class="tab on" data-tab="analyzer"><span class="ti">&#128104;</span> Body Analyzer</button>
@@ -213,6 +307,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </header>
 
+<!-- ANALYZER PANEL -->
 <div class="panel on" id="p-analyzer">
   <div class="analyzer">
     <div class="body-panel">
@@ -226,7 +321,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
     <div class="right-panel">
       <div class="rblock">
         <div class="sec-title">Bilateral Mobility</div>
-        <div class="sec-sub">Enter degrees for LEFT and RIGHT side. Imbalances over 10° need attention.</div>
+        <div class="sec-sub">Enter degrees in 5° steps for LEFT and RIGHT side. Imbalances over 10° need attention.</div>
 
         <div class="fg" style="margin-bottom:14px"><label>Client Name (optional - for PDF)</label><input class="fi" id="diag-client-name" placeholder="e.g. Maria Garcia"/></div>
 
@@ -317,6 +412,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
+<!-- AGENDA PANEL -->
 <div class="panel" id="p-agenda">
   <div class="layout">
     <aside class="side">
@@ -338,45 +434,50 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
+</div>
+<!-- end app-container --><!-- CLIENT MODAL -->
 <div class="mo" id="m-cli">
   <div class="md">
     <div class="md-h"><h2 id="m-cli-t">Add New Client</h2><button class="md-x" data-close="m-cli">&times;</button></div>
     <div class="md-b">
       <input type="hidden" id="f-id"/>
       <div class="fg"><label>Full Name *</label><input class="fi" id="f-name" placeholder="Maria Garcia"/></div>
-      <div class="fr">
-        <div class="fg"><label>Age</label><input class="fi" id="f-age" type="number"/></div>
+      <div class="fr2">
+        <div class="fg"><label>Email *</label><input class="fi" id="f-email" type="email" placeholder="client@email.com"/></div>
         <div class="fg"><label>Phone</label><input class="fi" id="f-phone"/></div>
+      </div>
+      <div class="fr2">
+        <div class="fg"><label>Age</label><input class="fi" id="f-age" type="number"/></div>
         <div class="fg"><label>Start Date</label><input class="fi" id="f-start" type="date"/></div>
       </div>
       <div class="fg"><label>Recommended Package</label>
         <select class="fi" id="f-pkg">
           <option value="">-- Select --</option>
-          <option value="elite">Elite (12/mo)</option>
-          <option value="intensive">Intensive (8/mo)</option>
-          <option value="basic">Basic (4/mo)</option>
-          <option value="maintenance">Maintenance (2/mo)</option>
+          <option value="elite">Elite (12/mo) - $480</option>
+          <option value="intensive">Intensive (8/mo) - $360</option>
+          <option value="basic">Basic (4/mo) - $200</option>
+          <option value="maintenance">Maintenance (2/mo) - $120</option>
         </select>
       </div>
       <div class="bilateral-fields">
         <div class="bf-title">Hip Flexion (deg)</div>
         <div class="fr2">
-          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="f-hipL" type="number"/></div>
-          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="f-hipR" type="number"/></div>
+          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="f-hipL" type="number" step="5"/></div>
+          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="f-hipR" type="number" step="5"/></div>
         </div>
       </div>
       <div class="bilateral-fields">
         <div class="bf-title">Hamstring / Femoral (deg)</div>
         <div class="fr2">
-          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="f-hamL" type="number"/></div>
-          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="f-hamR" type="number"/></div>
+          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="f-hamL" type="number" step="5"/></div>
+          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="f-hamR" type="number" step="5"/></div>
         </div>
       </div>
       <div class="bilateral-fields">
         <div class="bf-title">Quadriceps (deg)</div>
         <div class="fr2">
-          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="f-quadL" type="number"/></div>
-          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="f-quadR" type="number"/></div>
+          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="f-quadL" type="number" step="5"/></div>
+          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="f-quadR" type="number" step="5"/></div>
         </div>
       </div>
       <div class="fg"><label>Priority Muscles</label><input class="fi" id="f-mus"/></div>
@@ -387,6 +488,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
+<!-- MEAS MODAL -->
 <div class="mo" id="m-meas">
   <div class="md">
     <div class="md-h"><h2>Update Measurements</h2><button class="md-x" data-close="m-meas">&times;</button></div>
@@ -396,22 +498,22 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
       <div class="bilateral-fields">
         <div class="bf-title">Hip Flexion (deg)</div>
         <div class="fr2">
-          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="mf-hipL" type="number"/></div>
-          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="mf-hipR" type="number"/></div>
+          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="mf-hipL" type="number" step="5"/></div>
+          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="mf-hipR" type="number" step="5"/></div>
         </div>
       </div>
       <div class="bilateral-fields">
         <div class="bf-title">Hamstring / Femoral (deg)</div>
         <div class="fr2">
-          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="mf-hamL" type="number"/></div>
-          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="mf-hamR" type="number"/></div>
+          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="mf-hamL" type="number" step="5"/></div>
+          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="mf-hamR" type="number" step="5"/></div>
         </div>
       </div>
       <div class="bilateral-fields">
         <div class="bf-title">Quadriceps (deg)</div>
         <div class="fr2">
-          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="mf-quadL" type="number"/></div>
-          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="mf-quadR" type="number"/></div>
+          <div class="fg"><label style="color:var(--pink)">&#9664; Left</label><input class="fi" id="mf-quadL" type="number" step="5"/></div>
+          <div class="fg"><label style="color:var(--violet)">Right &#9654;</label><input class="fi" id="mf-quadR" type="number" step="5"/></div>
         </div>
       </div>
       <div class="fg"><label>Observation</label><input class="fi" id="mf-note"/></div>
@@ -420,6 +522,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
+<!-- SESSION MODAL -->
 <div class="mo" id="m-ses">
   <div class="md">
     <div class="md-h"><h2>Add Session</h2><button class="md-x" data-close="m-ses">&times;</button></div>
@@ -437,45 +540,197 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   </div>
 </div>
 
+<!-- PAYMENT MODAL -->
+<div class="mo" id="m-pay">
+  <div class="md">
+    <div class="md-h"><h2>Register Payment & Generate Invoice</h2><button class="md-x" data-close="m-pay">&times;</button></div>
+    <div class="md-b">
+      <input type="hidden" id="pf-cid"/>
+      <div class="fr2">
+        <div class="fg"><label>Invoice Number</label><input class="fi" id="pf-num" readonly style="background:var(--card);color:var(--violet);font-weight:700"/></div>
+        <div class="fg"><label>Date</label><input class="fi" id="pf-date" type="date"/></div>
+      </div>
+      <div class="fg"><label>Package</label>
+        <select class="fi" id="pf-pkg">
+          <option value="elite">Elite - 12 sessions x 30 mins</option>
+          <option value="intensive">Intensive - 8 sessions x 30 mins</option>
+          <option value="basic">Basic - 4 sessions x 30 mins</option>
+          <option value="maintenance">Maintenance - 2 sessions x 30 mins</option>
+        </select>
+      </div>
+      <div class="fr2">
+        <div class="fg"><label>Sessions</label><input class="fi" id="pf-sess" type="number"/></div>
+        <div class="fg"><label>Amount ($)</label><input class="fi" id="pf-amt" type="number" step="0.01"/></div>
+      </div>
+      <div class="fg"><label>Description</label><input class="fi" id="pf-desc" placeholder="Auto-filled by package"/></div>
+      <div class="fg"><label>Invoice Language</label>
+        <select class="fi" id="pf-lang">
+          <option value="en">English</option>
+          <option value="es">Español</option>
+        </select>
+      </div>
+      <div class="fg"><label>Notes</label><textarea class="ft" id="pf-notes" placeholder="Optional notes for the invoice"></textarea></div>
+      <div style="background:rgba(52,211,153,.1);border:1px solid rgba(52,211,153,.3);border-radius:8px;padding:10px 12px;margin-top:6px;font-size:11px;color:#86efac">
+        <b>&#10004; Auto:</b> Saving will renew the package, reset session counter, and generate invoice PDF.
+      </div>
+    </div>
+    <div class="md-f"><button class="bc" data-close="m-pay">Cancel</button><button class="bs" id="b-save-pay">Save & Generate Invoice</button></div>
+  </div>
+</div>
+
 <div class="toast" id="toast"></div><script>
 (function(){
 // ===== GOOGLE SHEETS API =====
 var API_URL='https://script.google.com/macros/s/AKfycbzbucBRUHtxAwQi6__Q45uu5Eacdkg35tdDiRaejzRby5g1Q9HZriRZR9HHfr2IrWuEdg/exec';
-var clients=[],sessions={},meas={};
+var clients=[],sessions={},meas={},payments={},users=[];
+var currentUser=null;
 
 function showLoader(msg){
   var L=document.getElementById('cfp-loader');
-  if(!L){L=document.createElement('div');L.id='cfp-loader';L.style.cssText='position:fixed;inset:0;background:rgba(11,10,30,0.95);z-index:5000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#a78bfa;font-family:Outfit;font-size:13px;font-weight:600';document.body.appendChild(L);}
+  if(!L){L=document.createElement('div');L.id='cfp-loader';L.style.cssText='position:fixed;inset:0;background:rgba(11,10,30,0.95);z-index:9000;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:12px;color:#a78bfa;font-family:Outfit;font-size:13px;font-weight:600';document.body.appendChild(L);}
   L.style.display='flex';
   L.innerHTML='<div style="width:40px;height:40px;border:3px solid rgba(139,92,246,0.2);border-top-color:#8b5cf6;border-radius:50%;animation:cfpspin 0.8s linear infinite"></div><div>'+msg+'</div>';
   if(!document.getElementById('cfpspinkey')){var st=document.createElement('style');st.id='cfpspinkey';st.textContent='@keyframes cfpspin{to{transform:rotate(360deg)}}';document.head.appendChild(st);}
 }
 function hideLoader(){var L=document.getElementById('cfp-loader');if(L)L.style.display='none';}
 
-// CRITICAL: Force IDs to be strings consistently
 function normalizeRecord(r){
   var out={};
   for(var k in r){
     var v=r[k];
-    // Force ID fields to strings always
-    if(k==='id'||k==='clientId'){
-      out[k]=v==null||v===''?'':String(v);
-    }else{
-      out[k]=v==null?'':v;
-    }
+    if(k==='id'||k==='clientId'){out[k]=v==null||v===''?'':String(v);}
+    else{out[k]=v==null?'':v;}
   }
   return out;
 }
 
+// ===== LOGIN SYSTEM =====
+async function hashPassword(p){
+  var enc=new TextEncoder().encode(p+'cfp_salt_2025');
+  var buf=await crypto.subtle.digest('SHA-256',enc);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+function showLoginErr(msg){
+  var e=document.getElementById('login-err');
+  e.textContent=msg;e.classList.add('on');
+  setTimeout(function(){e.classList.remove('on');},5000);
+}
+function showRegErr(msg){
+  var e=document.getElementById('reg-err');
+  e.textContent=msg;e.classList.add('on');
+  setTimeout(function(){e.classList.remove('on');},5000);
+}
+function showRegSuc(msg){
+  var e=document.getElementById('reg-suc');
+  e.textContent=msg;e.classList.add('on');
+}
+
+async function attemptLogin(){
+  var email=(document.getElementById('login-email').value||'').trim().toLowerCase();
+  var pwd=document.getElementById('login-pwd').value||'';
+  if(!email||!pwd){showLoginErr('Please enter email and password');return;}
+  showLoader('Signing in...');
+  try{
+    var res=await fetch(API_URL+'?action=getAll');
+    var data=await res.json();
+    var allUsers=(data.users||[]).map(normalizeRecord);
+    var hash=await hashPassword(pwd);
+    var match=null;
+    for(var i=0;i<allUsers.length;i++){
+      if(String(allUsers[i].email).toLowerCase()===email&&String(allUsers[i].passwordHash)===hash){
+        match=allUsers[i];break;
+      }
+    }
+    hideLoader();
+    if(!match){showLoginErr('Invalid email or password');return;}
+    if(String(match.status).toLowerCase()!=='active'){
+      showLoginErr('Your account is pending admin approval');return;
+    }
+    currentUser=match;
+    try{localStorage.setItem('cfp_session',JSON.stringify({email:match.email,id:match.id,name:match.name}));}catch(e){}
+    enterApp();
+  }catch(err){hideLoader();showLoginErr('Connection error: '+err.message);}
+}
+
+async function attemptRegister(){
+  var name=(document.getElementById('reg-name').value||'').trim();
+  var email=(document.getElementById('reg-email').value||'').trim().toLowerCase();
+  var pwd=document.getElementById('reg-pwd').value||'';
+  var pwd2=document.getElementById('reg-pwd2').value||'';
+  if(!name||!email||!pwd||!pwd2){showRegErr('Please fill all fields');return;}
+  if(pwd.length<6){showRegErr('Password must be at least 6 characters');return;}
+  if(pwd!==pwd2){showRegErr('Passwords do not match');return;}
+  if(!email.match(/^[^\s@]+@[^\s@]+\.[^\s@]+$/)){showRegErr('Invalid email');return;}
+  showLoader('Creating account...');
+  try{
+    var hash=await hashPassword(pwd);
+    var newUser={
+      id:'u'+Date.now(),
+      email:email,
+      passwordHash:hash,
+      name:name,
+      createdAt:new Date().toISOString().split('T')[0]
+    };
+    var res=await fetch(API_URL,{method:'POST',body:JSON.stringify({action:'registerUser',payload:newUser})});
+    var data=await res.json();
+    hideLoader();
+    if(!data.success){showRegErr(data.error||'Could not create account');return;}
+    showRegSuc('Account created! Awaiting admin approval. You will be notified when activated.');
+    document.getElementById('reg-name').value='';
+    document.getElementById('reg-email').value='';
+    document.getElementById('reg-pwd').value='';
+    document.getElementById('reg-pwd2').value='';
+    setTimeout(function(){
+      document.getElementById('register-form').style.display='none';
+      document.getElementById('login-form').style.display='block';
+    },3000);
+  }catch(err){hideLoader();showRegErr('Connection error: '+err.message);}
+}
+
+function enterApp(){
+  document.getElementById('login-screen').classList.remove('on');
+  document.getElementById('app-container').classList.add('on');
+  document.getElementById('hdr-user-name').textContent=currentUser.name||'User';
+  document.getElementById('hdr-user-email').textContent=currentUser.email||'';
+  loadFromSheets(function(){renderList();});
+}
+
+function logout(){
+  if(!confirm('Sign out?'))return;
+  try{localStorage.removeItem('cfp_session');}catch(e){}
+  currentUser=null;
+  clients=[];sessions={};meas={};payments={};users=[];
+  document.getElementById('app-container').classList.remove('on');
+  document.getElementById('login-screen').classList.add('on');
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pwd').value='';
+}
+
+function checkSession(){
+  try{
+    var s=localStorage.getItem('cfp_session');
+    if(s){
+      var sess=JSON.parse(s);
+      currentUser={id:sess.id,email:sess.email,name:sess.name};
+      enterApp();
+      return true;
+    }
+  }catch(e){}
+  return false;
+}
+
 function loadFromSheets(cb){
-  showLoader('Loading from Google Sheets...');
+  showLoader('Loading data...');
   fetch(API_URL+'?action=getAll').then(function(r){return r.json();}).then(function(data){
-    // Normalize all records so IDs are always strings
     clients=(data.clients||[]).map(normalizeRecord);
     var sessArr=(data.sessions||[]).map(normalizeRecord);sessions={};
     for(var i=0;i<sessArr.length;i++){var s=sessArr[i];if(!s.clientId)continue;if(!sessions[s.clientId])sessions[s.clientId]=[];sessions[s.clientId].push(s);}
     var measArr=(data.measurements||[]).map(normalizeRecord);meas={};
     for(var j=0;j<measArr.length;j++){var m=measArr[j];if(!m.clientId)continue;if(!meas[m.clientId])meas[m.clientId]=[];meas[m.clientId].push(m);}
+    var payArr=(data.payments||[]).map(normalizeRecord);payments={};
+    for(var p=0;p<payArr.length;p++){var pp=payArr[p];if(!pp.clientId)continue;if(!payments[pp.clientId])payments[pp.clientId]=[];payments[pp.clientId].push(pp);}
+    users=(data.users||[]).map(normalizeRecord);
     hideLoader();
     if(cb)cb();
   }).catch(function(err){hideLoader();alert('Error loading: '+err);});
@@ -484,8 +739,15 @@ function loadFromSheets(cb){
 function saveAll(){
   var sessArr=[];for(var cid in sessions){var arr=sessions[cid];for(var i=0;i<arr.length;i++){var s=arr[i];s.clientId=String(cid);sessArr.push(s);}}
   var measArr=[];for(var cid2 in meas){var arr2=meas[cid2];for(var j=0;j<arr2.length;j++){var m=arr2[j];m.clientId=String(cid2);measArr.push(m);}}
-  showLoader('Saving to Google Sheets...');
-  fetch(API_URL,{method:'POST',body:JSON.stringify({action:'saveAll',payload:{clients:clients,sessions:sessArr,measurements:measArr}})}).then(function(r){return r.json();}).then(function(data){hideLoader();if(!data.success)alert('Error saving');}).catch(function(err){hideLoader();alert('Save error: '+err);});
+  var payArr=[];for(var cid3 in payments){var arr3=payments[cid3];for(var k=0;k<arr3.length;k++){var p=arr3[k];p.clientId=String(cid3);payArr.push(p);}}
+  showLoader('Saving...');
+  fetch(API_URL,{method:'POST',body:JSON.stringify({action:'saveAll',payload:{clients:clients,sessions:sessArr,measurements:measArr,payments:payArr}})}).then(function(r){return r.json();}).then(function(data){hideLoader();if(!data.success)alert('Error saving');}).catch(function(err){hideLoader();alert('Save error: '+err);});
+}
+
+function getNextInvoiceNumber(cb){
+  fetch(API_URL+'?action=getInvoiceNumber').then(function(r){return r.json();}).then(function(data){
+    cb(data.invoiceNumber||'INV0019');
+  }).catch(function(){cb('INV0019');});
 }
 
 function switchTab(name){
@@ -495,8 +757,8 @@ function switchTab(name){
   document.getElementById('p-agenda').classList.toggle('on',name==='agenda');
 }
 
+// ===== BODY SVG =====
 var diagRun=false;
-
 function getLevel(k,v){
   if(k==='hip')return v<45?'crit':v<70?'mod':v<90?'mild':'good';
   if(k==='ham')return v<40?'crit':v<65?'mod':v<90?'mild':'good';
@@ -506,7 +768,6 @@ function getLevel(k,v){
 function levSev(l){return{crit:'sev-c',mod:'sev-m',mild:'sev-w',good:'sev-g'}[l];}
 function levLabel(l){return{crit:'Critical',mod:'Moderate',mild:'Mild',good:'Optimal'}[l];}
 function levColor(l){return{crit:'#ef4444',mod:'#f97316',mild:'#fbbf24',good:'#34d399'}[l];}
-
 function getImbalance(L,R){
   if(!L||!R)return null;
   var diff=Math.abs(L-R);
@@ -526,7 +787,6 @@ function getDiagState(side,key){
   if(lvl==='mild')return 'mild';
   return null;
 }
-
 function bilatPath(side,key,paths){
   var sel=getDiagState(side,key);
   var fill='rgba(139,92,246,0.18)',stroke='rgba(139,92,246,0.5)',sw='1.2',extraClass='';
@@ -566,7 +826,7 @@ function buildBody(){
   s+='</svg>';
   return s;
 }
-function renderBody(){document.getElementById('svg-wrap').innerHTML=buildBody();}
+function renderBody(){var w=document.getElementById('svg-wrap');if(w)w.innerHTML=buildBody();}
 
 function updateBilateralBadge(id,key){
   var el=document.getElementById(id+'-badge');
@@ -595,6 +855,7 @@ function updateImbalanceWarn(key){
 }
 function updateImbalanceSummary(){
   var rows=document.getElementById('imbal-rows');
+  if(!rows)return;
   var pairs=[{key:'hip',name:'Hip Flexion'},{key:'ham',name:'Hamstring'},{key:'quad',name:'Quadriceps'}];
   var html='';
   for(var i=0;i<pairs.length;i++){
@@ -618,7 +879,7 @@ function refreshAnalyzerInputs(){
     updateImbalanceWarn(keys[i]);
   }
   updateImbalanceSummary();
-}// ===== DIAGNOSIS - SHORT & CONCISE =====
+}// ===== DIAGNOSIS =====
 var DIAG_SHORT={
   hip:{
     crit:{title:'Severe Hip Restriction',text:'Iliopsoas very tight, causing chronic low back pain.',issues:['Chronic low back pain','Forward-tilted pelvis','Hip impingement','Weak glutes'],pkg:'Elite - 12 sessions/month'},
@@ -639,22 +900,11 @@ var DIAG_SHORT={
     good:{title:'Excellent Quad Mobility',text:'Healthy quadriceps length. Patellar tracking supported.',issues:['Maintain monthly','Check side-to-side balance'],pkg:'Maintenance - 2 sessions/month'}
   }
 };
-
 var IMBAL_INFO={
-  hip:{
-    bad:{title:'Significant Hip Imbalance',issues:['Pelvic torsion','Functional leg length difference','SI joint stress','Asymmetric gait']},
-    mild:{title:'Mild Hip Imbalance',issues:['Subtle pelvic asymmetry','Minor SI joint stress']}
-  },
-  ham:{
-    bad:{title:'Significant Hamstring Imbalance',issues:['Pelvic obliquity','Sacroiliac stress','Higher strain risk on tight side','Compensatory rotation']},
-    mild:{title:'Mild Hamstring Imbalance',issues:['Subtle posterior asymmetry','Slight pelvic tilt']}
-  },
-  quad:{
-    bad:{title:'Significant Quadriceps Imbalance',issues:['Asymmetric knee tracking','Patellar compression risk','Squat depth difference','ITB stress']},
-    mild:{title:'Mild Quadriceps Imbalance',issues:['Slight knee tracking issue','Minor squat asymmetry']}
-  }
+  hip:{bad:{title:'Significant Hip Imbalance',issues:['Pelvic torsion','Functional leg length difference','SI joint stress','Asymmetric gait']},mild:{title:'Mild Hip Imbalance',issues:['Subtle pelvic asymmetry','Minor SI joint stress']}},
+  ham:{bad:{title:'Significant Hamstring Imbalance',issues:['Pelvic obliquity','Sacroiliac stress','Higher strain risk on tight side','Compensatory rotation']},mild:{title:'Mild Hamstring Imbalance',issues:['Subtle posterior asymmetry','Slight pelvic tilt']}},
+  quad:{bad:{title:'Significant Quadriceps Imbalance',issues:['Asymmetric knee tracking','Patellar compression risk','Squat depth difference','ITB stress']},mild:{title:'Mild Quadriceps Imbalance',issues:['Slight knee tracking issue','Minor squat asymmetry']}}
 };
-
 var lastDiag=null;
 
 function runDiag(){
@@ -662,10 +912,7 @@ function runDiag(){
   var labels={hip:'Hip Flexion',ham:'Hamstring',quad:'Quadriceps'};
   var vals={};
   for(var i=0;i<keys.length;i++){
-    vals[keys[i]]={
-      L:parseInt(document.getElementById(keys[i]+'L').value)||0,
-      R:parseInt(document.getElementById(keys[i]+'R').value)||0
-    };
+    vals[keys[i]]={L:parseInt(document.getElementById(keys[i]+'L').value)||0,R:parseInt(document.getElementById(keys[i]+'R').value)||0};
   }
   var prio={crit:0,mod:1,mild:2,good:3};
   var allLvls=[];
@@ -673,13 +920,10 @@ function runDiag(){
   allLvls.sort(function(a,b){return prio[a]-prio[b];});
   var worst=allLvls[0];
   var pkgMap={crit:'Elite Package - 12 sessions/month',mod:'Intensive Package - 8 sessions/month',mild:'Basic Package - 4 sessions/month',good:'Maintenance Package - 2 sessions/month'};
-
   document.getElementById('diag-empty').style.display='none';
   var html='';
   html+='<div class="dcard"><div class="dcard-hd" data-cardtoggle="c-overall"><h4>&#127919; Overall Assessment</h4><span class="sev '+levSev(worst)+'">'+levLabel(worst)+'</span></div><div class="dcard-body open" id="c-overall"><div class="rec-box"><strong>Recommended Package</strong><p style="color:var(--pink);font-weight:700;font-size:13px">'+pkgMap[worst]+'</p></div></div></div>';
-
   lastDiag={vals:vals,keys:keys,labels:labels,worst:worst,pkgMap:pkgMap,clientName:document.getElementById('diag-client-name').value||'Client'};
-
   for(var idx=0;idx<keys.length;idx++){
     var k=keys[idx];
     var L=vals[k].L,R=vals[k].R;
@@ -688,14 +932,12 @@ function runDiag(){
     var worstSide=prio[lvlL]<=prio[lvlR]?'L':'R';
     var worstLvl=worstSide==='L'?lvlL:lvlR;
     var d=DIAG_SHORT[k][worstLvl];
-
     html+='<div class="dcard"><div class="dcard-hd" data-cardtoggle="c-'+k+'"><h4>'+labels[k]+'</h4><span class="sev '+levSev(worstLvl)+'">'+levLabel(worstLvl)+'</span></div><div class="dcard-body" id="c-'+k+'">';
     html+='<div class="bil-pair"><div class="bil-pair-side L"><div class="pn">&#9664; LEFT</div><div class="pv" style="color:'+levColor(lvlL)+'">'+L+'\u00B0</div><div style="font-size:9px;color:var(--dgray);margin-top:2px">'+levLabel(lvlL)+'</div></div><div class="bil-pair-side R"><div class="pn">RIGHT &#9654;</div><div class="pv" style="color:'+levColor(lvlR)+'">'+R+'\u00B0</div><div style="font-size:9px;color:var(--dgray);margin-top:2px">'+levLabel(lvlR)+'</div></div></div>';
     html+='<p><strong style="color:var(--pink)">'+d.title+'</strong></p><p>'+d.text+'</p>';
     html+='<p style="font-size:11px;color:var(--dgray);margin-top:8px;font-weight:700;text-transform:uppercase;letter-spacing:.06em">Issues:</p><ul>';
     for(var j=0;j<d.issues.length;j++)html+='<li>'+d.issues[j]+'</li>';
     html+='</ul>';
-
     var imb=getImbalance(L,R);
     if(imb&&imb.lvl!=='ok'){
       var ii=IMBAL_INFO[k][imb.lvl];
@@ -715,43 +957,29 @@ function runDiag(){
   document.getElementById('pdf-btn').disabled=false;
 }
 
-// ===== PDF EXPORT =====
-function exportPDF(){
+function exportDiagPDF(){
   if(!lastDiag){alert('Please run analysis first');return;}
   var jsPDF=window.jspdf.jsPDF;
   var doc=new jsPDF();
   var pageW=210,margin=15,y=20;
   var d=lastDiag;
-  doc.setFillColor(11,10,30);
-  doc.rect(0,0,pageW,30,'F');
-  doc.setTextColor(236,72,153);
-  doc.setFontSize(18);
-  doc.setFont(undefined,'bold');
+  doc.setFillColor(11,10,30);doc.rect(0,0,pageW,30,'F');
+  doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');
   doc.text('CatholicFitPlans',margin,15);
-  doc.setTextColor(167,139,250);
-  doc.setFontSize(10);
-  doc.setFont(undefined,'normal');
+  doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');
   doc.text('Bilateral Mobility Diagnosis Report',margin,22);
   y=42;
-  doc.setTextColor(0,0,0);
-  doc.setFontSize(13);
-  doc.setFont(undefined,'bold');
+  doc.setTextColor(0,0,0);doc.setFontSize(13);doc.setFont(undefined,'bold');
   doc.text('Client: '+d.clientName,margin,y);
   y+=6;
-  doc.setFontSize(10);
-  doc.setFont(undefined,'normal');
-  doc.setTextColor(80,80,80);
+  doc.setFontSize(10);doc.setFont(undefined,'normal');doc.setTextColor(80,80,80);
   doc.text('Date: '+new Date().toLocaleDateString(),margin,y);
   y+=12;
-  doc.setFillColor(245,243,255);
-  doc.rect(margin,y-5,pageW-margin*2,16,'F');
-  doc.setTextColor(0,0,0);
-  doc.setFontSize(11);
-  doc.setFont(undefined,'bold');
+  doc.setFillColor(245,243,255);doc.rect(margin,y-5,pageW-margin*2,16,'F');
+  doc.setTextColor(0,0,0);doc.setFontSize(11);doc.setFont(undefined,'bold');
   doc.text('Overall Recommendation',margin+3,y);
   y+=6;
-  doc.setTextColor(236,72,153);
-  doc.setFont(undefined,'bold');
+  doc.setTextColor(236,72,153);doc.setFont(undefined,'bold');
   doc.text(d.pkgMap[d.worst],margin+3,y);
   y+=14;
   for(var i=0;i<d.keys.length;i++){
@@ -764,79 +992,166 @@ function exportPDF(){
     var worstLvl=worstSide==='L'?lvlL:lvlR;
     var diag=DIAG_SHORT[k][worstLvl];
     if(y>250){doc.addPage();y=20;}
-    doc.setFillColor(30,28,74);
-    doc.rect(margin,y-4,pageW-margin*2,8,'F');
-    doc.setTextColor(255,255,255);
-    doc.setFontSize(11);
-    doc.setFont(undefined,'bold');
+    doc.setFillColor(30,28,74);doc.rect(margin,y-4,pageW-margin*2,8,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont(undefined,'bold');
     doc.text(d.labels[k],margin+3,y+2);
     y+=10;
-    doc.setTextColor(236,72,153);
-    doc.setFontSize(10);
+    doc.setTextColor(236,72,153);doc.setFontSize(10);
     doc.text('LEFT: '+L+' deg ('+levLabel(lvlL)+')',margin+3,y);
     doc.setTextColor(139,92,246);
     doc.text('RIGHT: '+R+' deg ('+levLabel(lvlR)+')',margin+90,y);
     y+=8;
-    doc.setTextColor(0,0,0);
-    doc.setFontSize(10);
-    doc.setFont(undefined,'bold');
+    doc.setTextColor(0,0,0);doc.setFontSize(10);doc.setFont(undefined,'bold');
     doc.text(diag.title,margin+3,y);
     y+=5;
-    doc.setFont(undefined,'normal');
-    doc.setFontSize(9);
+    doc.setFont(undefined,'normal');doc.setFontSize(9);
     var lines=doc.splitTextToSize(diag.text,pageW-margin*2-6);
     doc.text(lines,margin+3,y);
     y+=lines.length*4+2;
-    doc.setFont(undefined,'bold');
-    doc.setFontSize(9);
-    doc.setTextColor(60,60,60);
+    doc.setFont(undefined,'bold');doc.setFontSize(9);doc.setTextColor(60,60,60);
     doc.text('Possible issues:',margin+3,y);
     y+=4;
-    doc.setFont(undefined,'normal');
-    doc.setTextColor(80,80,80);
-    for(var ii=0;ii<diag.issues.length;ii++){
-      doc.text('  - '+diag.issues[ii],margin+3,y);
-      y+=4;
-    }
+    doc.setFont(undefined,'normal');doc.setTextColor(80,80,80);
+    for(var ii=0;ii<diag.issues.length;ii++){doc.text('  - '+diag.issues[ii],margin+3,y);y+=4;}
     var imb=getImbalance(L,R);
     if(imb&&imb.lvl!=='ok'){
       var info=IMBAL_INFO[k][imb.lvl];
       var weakSide=L>R?'RIGHT':'LEFT';
       y+=2;
-      doc.setFont(undefined,'bold');
-      doc.setTextColor(249,115,22);
-      doc.setFontSize(9);
+      doc.setFont(undefined,'bold');doc.setTextColor(249,115,22);doc.setFontSize(9);
       doc.text('* '+info.title+' (diff: '+imb.diff+' deg, '+weakSide+' tighter)',margin+3,y);
       y+=4;
-      doc.setFont(undefined,'normal');
-      doc.setTextColor(80,80,80);
-      for(var ji=0;ji<info.issues.length;ji++){
-        doc.text('  - '+info.issues[ji],margin+3,y);
-        y+=4;
-      }
+      doc.setFont(undefined,'normal');doc.setTextColor(80,80,80);
+      for(var ji=0;ji<info.issues.length;ji++){doc.text('  - '+info.issues[ji],margin+3,y);y+=4;}
     }
     y+=2;
-    doc.setFillColor(245,243,255);
-    doc.rect(margin,y-3,pageW-margin*2,7,'F');
-    doc.setTextColor(139,92,246);
-    doc.setFont(undefined,'bold');
-    doc.setFontSize(9);
+    doc.setFillColor(245,243,255);doc.rect(margin,y-3,pageW-margin*2,7,'F');
+    doc.setTextColor(139,92,246);doc.setFont(undefined,'bold');doc.setFontSize(9);
     doc.text('Recommended: '+diag.pkg,margin+3,y+2);
     y+=12;
   }
-  doc.setTextColor(150,150,150);
-  doc.setFontSize(8);
-  doc.setFont(undefined,'italic');
+  doc.setTextColor(150,150,150);doc.setFontSize(8);doc.setFont(undefined,'italic');
   doc.text('CatholicFitPlans - Assisted Stretching - Personalized Diagnosis',margin,285);
   doc.save('Diagnosis-'+d.clientName.replace(/ /g,'_')+'-'+new Date().toISOString().split('T')[0]+'.pdf');
 }
 
-// ===== AGENDA HELPERS =====
+// ===== INVOICE PDF =====
+var INVOICE_TXT={
+  en:{invoice:'INVOICE',invoiceFor:'INVOICE FOR',number:'NUMBER',date:'DATE',description:'Description',qty:'Cant.',price:'Price',total:'TOTAL',thanks:'Thank you for your business!',footer:'CatholicFitPlans - Assisted Stretching'},
+  es:{invoice:'FACTURA',invoiceFor:'FACTURA PARA',number:'NUMERO',date:'FECHA',description:'Descripcion',qty:'Cant.',price:'Precio',total:'TOTAL',thanks:'Gracias por su preferencia!',footer:'CatholicFitPlans - Estiramiento Asistido'}
+};
+
+function generateInvoicePDF(payment,client){
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF();
+  var pageW=210,margin=15;
+  var lang=payment.language||'en';
+  var t=INVOICE_TXT[lang];
+  // Black header background top section
+  doc.setFillColor(11,10,30);doc.rect(0,0,pageW,75,'F');
+  // Logo circle
+  doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');
+  doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');
+  doc.text('+',pageW/2,35,{align:'center'});
+  // Title
+  doc.setFontSize(28);doc.setTextColor(236,72,153);doc.setFont(undefined,'bold');
+  doc.text(t.invoice,pageW/2,58,{align:'center'});
+  // Date below
+  doc.setFontSize(10);doc.setTextColor(167,139,250);doc.setFont(undefined,'normal');
+  var dateStr=formatInvoiceDate(payment.date,lang);
+  doc.text(dateStr,pageW/2,68,{align:'center'});
+  // Client info section
+  var y=90;
+  doc.setTextColor(0,0,0);doc.setFontSize(11);doc.setFont(undefined,'bold');
+  doc.text(t.invoiceFor+': '+(client.name||'').toUpperCase(),margin,y);
+  doc.text(t.number+': '+(payment.invoiceNumber||'INV0019'),pageW-margin,y,{align:'right'});
+  y+=6;
+  doc.setFont(undefined,'normal');doc.setFontSize(10);
+  if(client.email){doc.text(client.email,margin,y);}
+  doc.text(t.date+': '+dateStr,pageW-margin,y,{align:'right'});
+  y+=15;
+  // Table header
+  doc.setFillColor(30,28,74);doc.rect(margin,y-5,pageW-margin*2,9,'F');
+  doc.setTextColor(255,255,255);doc.setFont(undefined,'bold');doc.setFontSize(11);
+  doc.text(t.description,margin+3,y);
+  doc.text(t.qty,margin+115,y);
+  doc.text(t.price,pageW-margin-3,y,{align:'right'});
+  y+=12;
+  // Row
+  doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');doc.setFontSize(10);
+  var desc=payment.description||(payment.sessions+' Sessions x 30 mins');
+  doc.text(desc,margin+3,y);
+  doc.text(String(payment.sessions||''),margin+118,y);
+  doc.text('$'+Number(payment.amount||0).toFixed(2),pageW-margin-3,y,{align:'right'});
+  y+=6;
+  doc.setDrawColor(220,220,220);doc.line(margin,y,pageW-margin,y);
+  y+=4;
+  // Notes
+  if(payment.notes){
+    y+=5;
+    doc.setFontSize(9);doc.setTextColor(100,100,100);doc.setFont(undefined,'italic');
+    var noteLines=doc.splitTextToSize(payment.notes,pageW-margin*2-6);
+    doc.text(noteLines,margin+3,y);
+    y+=noteLines.length*4+5;
+  }
+  // Total
+  y=Math.max(y+30,200);
+  doc.setFillColor(245,243,255);doc.rect(margin+90,y-5,pageW-margin-90,12,'F');
+  doc.setTextColor(0,0,0);doc.setFont(undefined,'bold');doc.setFontSize(13);
+  doc.text(t.total+':',margin+95,y+2);
+  doc.setTextColor(236,72,153);
+  doc.text('$'+Number(payment.amount||0).toFixed(2),pageW-margin-3,y+2,{align:'right'});
+  // Footer
+  doc.setTextColor(139,92,246);doc.setFont(undefined,'italic');doc.setFontSize(11);
+  doc.text(t.thanks,pageW/2,y+25,{align:'center'});
+  doc.setTextColor(150,150,150);doc.setFont(undefined,'normal');doc.setFontSize(8);
+  doc.text(t.footer,pageW/2,285,{align:'center'});
+  return doc;
+}
+
+function formatInvoiceDate(dateStr,lang){
+  if(!dateStr)return '';
+  var p=String(dateStr).split('-');
+  if(p.length!==3)return String(dateStr);
+  var monthsEn=['January','February','March','April','May','June','July','August','September','October','November','December'];
+  var monthsEs=['enero','febrero','marzo','abril','mayo','junio','julio','agosto','septiembre','octubre','noviembre','diciembre'];
+  var months=lang==='es'?monthsEs:monthsEn;
+  return months[parseInt(p[1])-1].toUpperCase()+' '+parseInt(p[2])+', '+p[0];
+}
+
+function downloadInvoice(payment,client){
+  var doc=generateInvoicePDF(payment,client);
+  doc.save('Invoice-'+(payment.invoiceNumber||'INV0019')+'-'+(client.name||'').replace(/ /g,'_')+'.pdf');
+}
+
+function emailInvoice(payment,client){
+  if(!client.email){alert('Client has no email address. Please edit the client and add an email.');return;}
+  var doc=generateInvoicePDF(payment,client);
+  doc.save('Invoice-'+(payment.invoiceNumber||'INV0019')+'-'+(client.name||'').replace(/ /g,'_')+'.pdf');
+  var lang=payment.language||'en';
+  var subject,body;
+  if(lang==='es'){
+    subject='Factura CatholicFitPlans - '+payment.invoiceNumber;
+    body='Hola '+client.name+',\n\nAdjunto la factura '+payment.invoiceNumber+' por $'+Number(payment.amount||0).toFixed(2)+' correspondiente a tu paquete de estiramiento asistido.\n\nLa factura se descargo a tu computadora. Por favor adjuntala al enviar este correo.\n\nGracias por tu preferencia.\n\nCatholicFitPlans';
+  }else{
+    subject='CatholicFitPlans Invoice - '+payment.invoiceNumber;
+    body='Hello '+client.name+',\n\nAttached is invoice '+payment.invoiceNumber+' for $'+Number(payment.amount||0).toFixed(2)+' for your assisted stretching package.\n\nThe invoice was downloaded to your computer. Please attach it before sending this email.\n\nThank you for your business.\n\nCatholicFitPlans';
+  }
+  setTimeout(function(){
+    window.location.href='mailto:'+encodeURIComponent(client.email)+'?subject='+encodeURIComponent(subject)+'&body='+encodeURIComponent(body);
+  },500);
+}// ===== AGENDA =====
 var activeId=null;
-var PKG={elite:{label:'Elite - 12/mo',cls:'pk-elite'},intensive:{label:'Intensive - 8/mo',cls:'pk-intensive'},basic:{label:'Basic - 4/mo',cls:'pk-basic'},maintenance:{label:'Maintenance - 2/mo',cls:'pk-maintenance'}};
+var PKG={elite:{label:'Elite - 12/mo',cls:'pk-elite',price:480,sessions:12},intensive:{label:'Intensive - 8/mo',cls:'pk-intensive',price:360,sessions:8},basic:{label:'Basic - 4/mo',cls:'pk-basic',price:200,sessions:4},maintenance:{label:'Maintenance - 2/mo',cls:'pk-maintenance',price:120,sessions:2}};
 function $(id){return document.getElementById(id);}
-// CRITICAL: All comparisons use String() to handle Google Sheets type variance
-function findClient(id){var s=String(id);for(var i=0;i<clients.length;i++)if(String(clients[i].id)===s)return clients[i];return null;}var PKG_SESSIONS={elite:12,intensive:8,basic:4,maintenance:2};
+function findClient(id){var s=String(id);for(var i=0;i<clients.length;i++)if(String(clients[i].id)===s)return clients[i];return null;}
+function findIdx(id){var s=String(id);for(var i=0;i<clients.length;i++)if(String(clients[i].id)===s)return i;return -1;}
+function initials(n){if(!n)return '?';var p=String(n).split(' '),s='';for(var i=0;i<p.length&&s.length<2;i++)if(p[i]&&p[i][0])s+=p[i][0];return s.toUpperCase();}
+function fmtDate(d){if(!d)return '';var p=String(d).split('-');if(p.length!==3)return String(d);var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[parseInt(p[1])-1]+' '+parseInt(p[2])+', '+p[0];}
+function today(){var d=new Date(),m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day;}
+function showToast(msg){var t=$('toast');t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2400);}
+function esc(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
+
 function getSessionsForCurrentPackage(clientId,client){
   var allSess=sessions[String(clientId)]||[];
   if(!client.packageStart)return allSess.slice();
@@ -844,8 +1159,8 @@ function getSessionsForCurrentPackage(clientId,client){
   return allSess.filter(function(s){return new Date(s.date)>=startDate;});
 }
 function getPackageStatus(client){
-  if(!client.package||!PKG_SESSIONS[client.package])return null;
-  var total=PKG_SESSIONS[client.package];
+  if(!client.package||!PKG[client.package])return null;
+  var total=PKG[client.package].sessions;
   var done=getSessionsForCurrentPackage(client.id,client).length;
   var remaining=total-done;
   var status='ok';
@@ -853,12 +1168,6 @@ function getPackageStatus(client){
   else if(remaining===1)status='warning';
   return{total:total,done:done,remaining:remaining,status:status};
 }
-function findIdx(id){var s=String(id);for(var i=0;i<clients.length;i++)if(String(clients[i].id)===s)return i;return -1;}
-function initials(n){if(!n)return '?';var p=String(n).split(' '),s='';for(var i=0;i<p.length&&s.length<2;i++)if(p[i]&&p[i][0])s+=p[i][0];return s.toUpperCase();}
-function fmtDate(d){if(!d)return '';var p=String(d).split('-');if(p.length!==3)return String(d);var m=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];return m[parseInt(p[1])-1]+' '+parseInt(p[2])+', '+p[0];}
-function today(){var d=new Date(),m=d.getMonth()+1,day=d.getDate();return d.getFullYear()+'-'+(m<10?'0':'')+m+'-'+(day<10?'0':'')+day;}
-function showToast(msg){var t=$('toast');t.textContent=msg;t.classList.add('on');setTimeout(function(){t.classList.remove('on');},2400);}
-function esc(s){if(s==null)return '';return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#39;');}
 
 function renderList(q){
   q=(q||'').toLowerCase();var html='',count=0;
@@ -869,7 +1178,7 @@ function renderList(q){
     var pkgStatus=getPackageStatus(c);
     var alertBadge='';
     if(pkgStatus){
-      if(pkgStatus.status==='expired')alertBadge='<span class="alert-badge">RENEW</span>';
+      if(pkgStatus.status==='expired')alertBadge='<span class="alert-badge" style="background:#ef4444">RENEW</span>';
       else if(pkgStatus.status==='warning')alertBadge='<span class="alert-badge" style="background:#f97316">1 LEFT</span>';
     }
     html+='<div class="cli'+(isActive?' on':'')+'" data-cid="'+esc(c.id)+'"><div class="cav">'+esc(initials(c.name))+'</div><div class="cinfo"><div class="cn">'+esc(c.name)+alertBadge+'</div><div class="cp">'+esc(pkg.label||'No package')+(pkgStatus?' &middot; '+pkgStatus.done+'/'+pkgStatus.total:'')+'</div></div></div>';
@@ -895,35 +1204,46 @@ function bilatBox(label,key,L,R){
   html+='<div class="bilval R"><div class="vn">Right &#9654;</div><div class="vv" style="color:'+(Rn?levColor(lvlR):'var(--dgray)')+'">'+(Rn?Rn+'\u00B0':'--')+'</div><div class="vlbl">'+(Rn?levLabel(lvlR):'No data')+'</div></div>';
   html+='</div>'+diffPill+'</div>';
   return html;
-}function renderDetail(id){
+}
+
+function renderDetail(id){
   var c=findClient(id);
-  if(!c){
-    $('empty').style.display='flex';
-    $('detail').style.display='none';
-    return;
-  }
-  $('empty').style.display='none';
-  $('detail').style.display='block';
+  if(!c){$('empty').style.display='flex';$('detail').style.display='none';return;}
+  $('empty').style.display='none';$('detail').style.display='block';
   var pkg=PKG[c.package]||{};
   var sid=String(c.id);
   var cSess=(sessions[sid]||[]).slice();cSess.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
   var cMeas=(meas[sid]||[]).slice();cMeas.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+  var cPay=(payments[sid]||[]).slice();cPay.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
   var h='<div class="dh"><div class="dh-l"><div class="dav">'+esc(initials(c.name))+'</div><div><div class="dn">'+esc(c.name)+'</div>';
   var meta='';if(c.age)meta+='Age '+esc(c.age)+'  ';if(c.start)meta+='Started '+fmtDate(c.start);
   if(meta)h+='<div class="dp">'+meta+'</div>';
+  if(c.email)h+='<div class="dp">'+esc(c.email)+'</div>';
   if(c.phone)h+='<div class="dp">'+esc(c.phone)+'</div>';
   h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'">&#128465;</button></div></div>';
 
-var pkgStatus=getPackageStatus(c);
+  var pkgStatus=getPackageStatus(c);
   if(pkgStatus){
     if(pkgStatus.status==='expired'){
-      h+='<div class="alert-banner"><div class="alert-banner-icon">&#128276;</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+pkgStatus.done+'/'+pkgStatus.total+' sessions completed. Time to renew the package.</p></div><button class="renew-btn" data-renew="'+esc(c.id)+'">Renew Package</button></div>';
+      h+='<div class="alert-banner"><div class="alert-banner-icon">&#128276;</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+pkgStatus.done+'/'+pkgStatus.total+' sessions completed. Register payment to renew.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'">Register Payment</button></div>';
     }else if(pkgStatus.status==='warning'){
-      h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">&#9888;</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+pkgStatus.done+'/'+pkgStatus.total+' completed. Schedule renewal soon.</p></div><button class="renew-btn" style="background:#f97316" data-renew="'+esc(c.id)+'">Renew Now</button></div>';
+      h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">&#9888;</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+pkgStatus.done+'/'+pkgStatus.total+' completed. Schedule renewal soon.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'">Renew Now</button></div>';
     }else{
       h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)"><div style="display:flex;align-items:center;justify-content:space-between"><div><h3 style="color:var(--green);margin-bottom:0">Package Progress</h3><p style="font-size:13px;color:var(--lgray);margin-top:4px">'+pkgStatus.done+' of '+pkgStatus.total+' sessions completed</p></div><div style="font-size:24px;font-weight:900;color:var(--green)">'+pkgStatus.done+'/'+pkgStatus.total+'</div></div></div>';
     }
-  }  h+='<div class="sec">Bilateral Measurements <button data-meas="'+esc(c.id)+'">+ Update</button></div>';
+  }
+
+  h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'">&#128176; Register Payment & Generate Invoice</button>';
+
+  if(cPay.length){
+    h+='<div class="sec">Payments &amp; Invoices ('+cPay.length+')</div>';
+    for(var pi=0;pi<cPay.length;pi++){
+      var p=cPay[pi];
+      h+='<div class="pay"><div class="pay-info"><div class="pay-num">'+esc(p.invoiceNumber||'')+'</div><div class="pay-amt">$'+Number(p.amount||0).toFixed(2)+'</div><div class="pay-meta">'+fmtDate(p.date)+' &middot; '+esc(p.description||'')+'</div></div><div class="pay-btns"><button class="pay-btn-sm" data-paydl="'+esc(c.id)+'|'+esc(p.id)+'">PDF</button><button class="pay-btn-sm email" data-payem="'+esc(c.id)+'|'+esc(p.id)+'">Email</button><button class="pay-btn-sm del" data-paydel="'+esc(c.id)+'|'+esc(p.id)+'">&#128465;</button></div></div>';
+    }
+  }
+
+  h+='<div class="sec">Bilateral Measurements <button data-meas="'+esc(c.id)+'">+ Update</button></div>';
   h+=bilatBox('Hip Flexion','hip',c.hipL,c.hipR);
   h+=bilatBox('Hamstring','ham',c.hamL,c.hamR);
   h+=bilatBox('Quadriceps','quad',c.quadL,c.quadR);
@@ -976,7 +1296,7 @@ function openModal(id){$(id).classList.add('on');}
 function closeModal(id){$(id).classList.remove('on');}
 function openAdd(){
   $('m-cli-t').textContent='Add New Client';
-  var fields=['f-id','f-name','f-age','f-phone','f-pkg','f-hipL','f-hipR','f-hamL','f-hamR','f-quadL','f-quadR','f-mus','f-str','f-notes'];
+  var fields=['f-id','f-name','f-email','f-age','f-phone','f-pkg','f-hipL','f-hipR','f-hamL','f-hamR','f-quadL','f-quadR','f-mus','f-str','f-notes'];
   for(var i=0;i<fields.length;i++)$(fields[i]).value='';
   $('f-start').value=today();
   openModal('m-cli');
@@ -984,7 +1304,7 @@ function openAdd(){
 function openEdit(id){
   var c=findClient(id);if(!c)return;
   $('m-cli-t').textContent='Edit Client';
-  $('f-id').value=c.id;$('f-name').value=c.name||'';$('f-age').value=c.age||'';$('f-phone').value=c.phone||'';$('f-start').value=c.start||'';$('f-pkg').value=c.package||'';
+  $('f-id').value=c.id;$('f-name').value=c.name||'';$('f-email').value=c.email||'';$('f-age').value=c.age||'';$('f-phone').value=c.phone||'';$('f-start').value=c.start||'';$('f-pkg').value=c.package||'';
   $('f-hipL').value=c.hipL||'';$('f-hipR').value=c.hipR||'';
   $('f-hamL').value=c.hamL||'';$('f-hamR').value=c.hamR||'';
   $('f-quadL').value=c.quadL||'';$('f-quadR').value=c.quadR||'';
@@ -998,7 +1318,8 @@ function saveClient(){
   var hamL=$('f-hamL').value,hamR=$('f-hamR').value;
   var quadL=$('f-quadL').value,quadR=$('f-quadR').value;
   var existingClient=eid?findClient(eid):null;
-  var data={id:String(newId),name:name,age:$('f-age').value,phone:$('f-phone').value,start:$('f-start').value,package:$('f-pkg').value,packageStart:existingClient&&existingClient.packageStart?existingClient.packageStart:(($('f-start').value)||today()),hipL:hipL,hipR:hipR,hamL:hamL,hamR:hamR,quadL:quadL,quadR:quadR,muscles:$('f-mus').value,stretches:$('f-str').value,notes:$('f-notes').value};  if(eid){var idx=findIdx(eid);if(idx>=0)clients[idx]=data;}
+  var data={id:String(newId),name:name,email:$('f-email').value,age:$('f-age').value,phone:$('f-phone').value,start:$('f-start').value,package:$('f-pkg').value,packageStart:existingClient&&existingClient.packageStart?existingClient.packageStart:(($('f-start').value)||today()),hipL:hipL,hipR:hipR,hamL:hamL,hamR:hamR,quadL:quadL,quadR:quadR,muscles:$('f-mus').value,stretches:$('f-str').value,notes:$('f-notes').value};
+  if(eid){var idx=findIdx(eid);if(idx>=0)clients[idx]=data;}
   else{clients.push(data);
     if(hipL||hipR||hamL||hamR||quadL||quadR){
       if(!meas[String(newId)])meas[String(newId)]=[];
@@ -1007,18 +1328,7 @@ function saveClient(){
   }
   saveAll();closeModal('m-cli');activeId=String(newId);renderList($('search').value);renderDetail(newId);showToast(eid?'Updated':'Added');
 }
-function renewPackage(id){
-  var c=findClient(id);if(!c)return;
-  if(!confirm('Renew package for '+c.name+'?\n\nThis will reset the session counter starting today.'))return;
-  var idx=findIdx(id);
-  if(idx>=0){
-    clients[idx].packageStart=today();
-    saveAll();
-    renderList($('search').value);
-    renderDetail(id);
-    showToast('Package renewed!');
-  }
-}function delClient(id){if(!confirm('Delete client?'))return;var s=String(id),nc=[];for(var i=0;i<clients.length;i++)if(String(clients[i].id)!==s)nc.push(clients[i]);clients=nc;delete sessions[s];delete meas[s];saveAll();if(String(activeId)===s){activeId=null;$('empty').style.display='flex';$('detail').style.display='none';}renderList($('search').value);showToast('Deleted');}
+function delClient(id){if(!confirm('Delete client?'))return;var s=String(id),nc=[];for(var i=0;i<clients.length;i++)if(String(clients[i].id)!==s)nc.push(clients[i]);clients=nc;delete sessions[s];delete meas[s];delete payments[s];saveAll();if(String(activeId)===s){activeId=null;$('empty').style.display='flex';$('detail').style.display='none';}renderList($('search').value);showToast('Deleted');}
 
 function openMeas(id){
   var c=findClient(id);if(!c)return;
@@ -1055,32 +1365,116 @@ function saveSes(){
 }
 function delSes(cid,sid){if(!confirm('Delete?'))return;var ss=String(sid),arr=sessions[cid]||[],n=[];for(var i=0;i<arr.length;i++)if(String(arr[i].id)!==ss)n.push(arr[i]);sessions[cid]=n;saveAll();renderDetail(cid);}
 
+// ===== PAYMENTS =====
+function openPay(id){
+  var c=findClient(id);if(!c)return;
+  if(!c.email){if(!confirm('Client has no email. Continue anyway?'))return;}
+  $('pf-cid').value=String(id);$('pf-date').value=today();
+  var pkgKey=c.package||'basic';
+  $('pf-pkg').value=pkgKey;
+  var pkgInfo=PKG[pkgKey];
+  $('pf-sess').value=pkgInfo.sessions;
+  $('pf-amt').value=pkgInfo.price;
+  $('pf-desc').value=pkgInfo.sessions+' Sessions x 30 mins';
+  $('pf-lang').value='en';
+  $('pf-notes').value='';
+  $('pf-num').value='Loading...';
+  getNextInvoiceNumber(function(num){$('pf-num').value=num;});
+  openModal('m-pay');
+}
+
+function onPkgChange(){
+  var pkgKey=$('pf-pkg').value;
+  var pkgInfo=PKG[pkgKey];
+  if(pkgInfo){
+    $('pf-sess').value=pkgInfo.sessions;
+    $('pf-amt').value=pkgInfo.price;
+    $('pf-desc').value=pkgInfo.sessions+' Sessions x 30 mins';
+  }
+}
+
+function savePay(){
+  var cid=$('pf-cid').value;
+  var c=findClient(cid);if(!c){alert('Client not found');return;}
+  var date=$('pf-date').value;if(!date){alert('Date required');return;}
+  var amt=parseFloat($('pf-amt').value);if(!amt||amt<=0){alert('Amount required');return;}
+  var num=$('pf-num').value;if(!num||num==='Loading...'){alert('Please wait for invoice number');return;}
+  var pay={
+    id:'p'+Date.now(),
+    clientId:String(cid),
+    invoiceNumber:num,
+    date:date,
+    amount:amt,
+    package:$('pf-pkg').value,
+    sessions:parseInt($('pf-sess').value)||0,
+    description:$('pf-desc').value,
+    language:$('pf-lang').value,
+    notes:$('pf-notes').value
+  };
+  if(!payments[cid])payments[cid]=[];payments[cid].push(pay);
+  // Auto-renew package
+  var idx=findIdx(cid);
+  if(idx>=0){
+    clients[idx].package=$('pf-pkg').value;
+    clients[idx].packageStart=date;
+  }
+  saveAll();
+  closeModal('m-pay');
+  // Generate invoice
+  var clientUpdated=findClient(cid);
+  if(confirm('Payment saved! Send invoice by email now?')){
+    emailInvoice(pay,clientUpdated);
+  }else{
+    if(confirm('Download invoice PDF instead?'))downloadInvoice(pay,clientUpdated);
+  }
+  renderDetail(cid);renderList($('search').value);showToast('Payment saved & package renewed');
+}
+
+function findPayment(cid,pid){var arr=payments[cid]||[];for(var i=0;i<arr.length;i++)if(String(arr[i].id)===String(pid))return arr[i];return null;}
+function downloadPay(cid,pid){var p=findPayment(cid,pid);var c=findClient(cid);if(p&&c)downloadInvoice(p,c);}
+function emailPay(cid,pid){var p=findPayment(cid,pid);var c=findClient(cid);if(p&&c)emailInvoice(p,c);}
+function delPay(cid,pid){if(!confirm('Delete payment?'))return;var sp=String(pid),arr=payments[cid]||[],n=[];for(var i=0;i<arr.length;i++)if(String(arr[i].id)!==sp)n.push(arr[i]);payments[cid]=n;saveAll();renderDetail(cid);}
+
+// ===== EVENT DELEGATION =====
 document.addEventListener('click',function(ev){
   var t=ev.target;
   while(t&&t!==document.body){
+    if(t.id==='login-btn'){attemptLogin();return;}
+    if(t.id==='reg-btn'){attemptRegister();return;}
+    if(t.id==='show-register'){document.getElementById('login-form').style.display='none';document.getElementById('register-form').style.display='block';return;}
+    if(t.id==='show-login'){document.getElementById('register-form').style.display='none';document.getElementById('login-form').style.display='block';return;}
+    if(t.id==='logout-btn'){logout();return;}
     if(t.dataset){
       if(t.dataset.tab){switchTab(t.dataset.tab);return;}
       if(t.id==='analyze-btn'){runDiag();return;}
-      if(t.id==='pdf-btn'){exportPDF();return;}
+      if(t.id==='pdf-btn'){exportDiagPDF();return;}
       if(t.dataset.cardtoggle){var cb=document.getElementById(t.dataset.cardtoggle);if(cb)cb.classList.toggle('open');return;}
       if(t.dataset.close){closeModal(t.dataset.close);return;}
       if(t.id==='add-btn'){openAdd();return;}
       if(t.id==='b-save-cli'){saveClient();return;}
       if(t.id==='b-save-meas'){saveMeas();return;}
       if(t.id==='b-save-ses'){saveSes();return;}
+      if(t.id==='b-save-pay'){savePay();return;}
       if(t.dataset.cid){activeId=t.dataset.cid;renderList($('search').value);renderDetail(activeId);return;}
       if(t.dataset.edit){openEdit(t.dataset.edit);return;}
       if(t.dataset.del){delClient(t.dataset.del);return;}
-      if(t.dataset.renew){renewPackage(t.dataset.renew);return;}
       if(t.dataset.meas){openMeas(t.dataset.meas);return;}
       if(t.dataset.addses){openSes(t.dataset.addses);return;}
+      if(t.dataset.pay){openPay(t.dataset.pay);return;}
       if(t.dataset.rmmeas){var p=t.dataset.rmmeas.split('|');delMeas(p[0],p[1]);return;}
       if(t.dataset.rmses){var p2=t.dataset.rmses.split('|');delSes(p2[0],p2[1]);return;}
+      if(t.dataset.paydl){var p3=t.dataset.paydl.split('|');downloadPay(p3[0],p3[1]);return;}
+      if(t.dataset.payem){var p4=t.dataset.payem.split('|');emailPay(p4[0],p4[1]);return;}
+      if(t.dataset.paydel){var p5=t.dataset.paydel.split('|');delPay(p5[0],p5[1]);return;}
       if(t.dataset.toggleses!=null){var sb=$('sb-'+t.dataset.toggleses);if(sb)sb.classList.toggle('on');return;}
     }
     t=t.parentNode;
   }
 });
+
+document.getElementById('login-pwd').addEventListener('keypress',function(e){if(e.key==='Enter')attemptLogin();});
+document.getElementById('reg-pwd2').addEventListener('keypress',function(e){if(e.key==='Enter')attemptRegister();});
+document.getElementById('pf-pkg').addEventListener('change',onPkgChange);
 
 var bilatInputs=['hipL','hipR','hamL','hamR','quadL','quadR'];
 for(var bi=0;bi<bilatInputs.length;bi++){
@@ -1091,9 +1485,13 @@ for(var bi=0;bi<bilatInputs.length;bi++){
 }
 document.getElementById('search').addEventListener('input',function(){renderList(document.getElementById('search').value);});
 
+// ===== INIT =====
 renderBody();
 refreshAnalyzerInputs();
-loadFromSheets(function(){renderList();});
+if(!checkSession()){
+  // Show login screen (already shown by default)
+}
+
 })();
 </script>
 </body>
