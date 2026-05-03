@@ -632,13 +632,10 @@ async function attemptLogin(){
   if(!email||!pwd){showLoginErr('Please enter email and password');return;}
   showLoader('Signing in...');
   try{
-    alert('STEP 1: Trying email '+email);
     var res=await fetch(API_URL+'?action=getAll');
     var data=await res.json();
     var allUsers=(data.users||[]).map(normalizeRecord);
-    alert('STEP 2: Got '+allUsers.length+' users from Sheets\nFirst user keys: '+(allUsers[0]?Object.keys(allUsers[0]).join(','):'NONE')+'\nFirst user email: '+(allUsers[0]?allUsers[0].email:'NONE')+'\nFirst user status: '+(allUsers[0]?allUsers[0].status:'NONE'));
     var hash=await hashPassword(pwd);
-    alert('STEP 3: My calculated hash:\n'+hash+'\n\nStored hash:\n'+(allUsers[0]?allUsers[0].passwordHash:'NONE')+'\n\nMatch?: '+(allUsers[0]&&String(allUsers[0].passwordHash)===hash));
     var match=null;
     for(var i=0;i<allUsers.length;i++){
       if(String(allUsers[i].email).toLowerCase()===email&&String(allUsers[i].passwordHash)===hash){
