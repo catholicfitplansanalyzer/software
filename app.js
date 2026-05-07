@@ -4,6 +4,17 @@ var activeId=null;
 var diagRun=false;
 var lastDiag=null;
 
+
+var LOGO_URL='9E6DC135-0C7C-4D3C-A50D-143B7950C0E0.png';
+var LOGO_DATA=null;
+function preloadLogo(){
+  fetch(LOGO_URL).then(function(r){return r.blob();}).then(function(blob){
+    var reader=new FileReader();
+    reader.onload=function(){LOGO_DATA=reader.result;};
+    reader.readAsDataURL(blob);
+  }).catch(function(){});
+}
+
 var PKG={elite:{label:'Elite - 12/mo',cls:'pk-elite',price:480,sessions:12},intensive:{label:'Intensive - 8/mo',cls:'pk-intensive',price:360,sessions:8},basic:{label:'Basic - 4/mo',cls:'pk-basic',price:200,sessions:4},maintenance:{label:'Maintenance - 2/mo',cls:'pk-maintenance',price:120,sessions:2}};
 
 function gid(id){return document.getElementById(id);}
@@ -209,10 +220,8 @@ function exportDiagPDF(){
   var pageW=210,margin=15,y=20;
   var d=lastDiag;
   doc.setFillColor(11,10,30);doc.rect(0,0,pageW,30,'F');
-  doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');
-  doc.text('CatholicFitPlans',margin,15);
-  doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');
-  doc.text('Bilateral Mobility Diagnosis Report',margin,22);
+  if(LOGO_DATA){try{doc.addImage(LOGO_DATA,'PNG',margin,4,22,22);doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin+26,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin+26,22);}catch(e){doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);}}
+  else{doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);}
   y=42;
   doc.setTextColor(0,0,0);doc.setFontSize(13);doc.setFont(undefined,'bold');
   doc.text('Client: '+d.clientName,margin,y);y+=6;
@@ -281,9 +290,8 @@ function generateInvoicePDF(p,c){
   var lang=p.language||'en';
   var t=INVOICE_TXT[lang];
   doc.setFillColor(11,10,30);doc.rect(0,0,pageW,75,'F');
-  doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');
-  doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');
-  doc.text('+',pageW/2,35,{align:'center'});
+  if(LOGO_DATA){try{doc.addImage(LOGO_DATA,'PNG',pageW/2-15,12,30,30);}catch(e){doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('+',pageW/2,35,{align:'center'});}}
+  else{doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('+',pageW/2,35,{align:'center'});}
   doc.setFontSize(28);doc.setTextColor(236,72,153);
   doc.text(t.invoice,pageW/2,58,{align:'center'});
   doc.setFontSize(10);doc.setTextColor(167,139,250);doc.setFont(undefined,'normal');
@@ -436,7 +444,7 @@ function renderDetail(id){
       h+='<div class="ses"><div class="ses-h" data-toggleses="'+si+'"><div><div class="ses-d">'+fmtDate(ss.date)+'</div><div class="ses-n">Session #'+esc(ss.num||'')+' - '+esc(ss.duration||'30 min')+'</div></div><span style="color:var(--dgray)">v</span></div><div class="ses-body" id="sb-'+si+'">';
       if(ss.stretches)h+='<p style="font-size:12px;color:var(--lgray);white-space:pre-wrap;margin-bottom:8px"><b>Stretches:</b> '+esc(ss.stretches)+'</p>';
       if(ss.notes)h+='<p style="font-size:12px;color:var(--lgray);margin-bottom:8px"><b>Notes:</b> '+esc(ss.notes)+'</p>';
-      h+='<div style="text-align:right"><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:0;border:0;color:var(--red);font-size:11px;cursor:pointer">Delete</button></div></div></div>';
+      h+='<div style="display:flex;justify-content:flex-end;gap:8px"><button data-editses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:transparent;border:1px solid var(--violet);color:#a78bfa;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:Outfit;font-weight:700">Edit</button><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:0;border:0;color:var(--red);font-size:11px;cursor:pointer">Delete</button></div></div></div>';
     }
   }else h+='<div style="text-align:center;padding:20px;color:var(--dgray);font-size:12px">No sessions yet.</div>';
   gid('detail').innerHTML=h;
@@ -521,18 +529,49 @@ function delMeas(cid,mid){
   renderDetail(cid);saveToSheets();
 }
 
-function openSes(id){
+function openSes(id,editSid){
   var c=findClient(id);if(!c)return;
   var ex=sessions[String(id)]||[];
-  gid('sf-cid').value=String(id);gid('sf-date').value=today();gid('sf-dur').value='30 min';gid('sf-num').value=ex.length+1;gid('sf-str').value=c.stretches||'';gid('sf-notes').value='';
+  gid('sf-cid').value=String(id);
+  gid('sf-sid').value=editSid||'';
+  if(editSid){
+    var s=null;for(var i=0;i<ex.length;i++)if(String(ex[i].id)===String(editSid)){s=ex[i];break;}
+    if(s){
+      gid('m-ses-t').textContent='Edit Session';
+      gid('sf-date').value=s.date||today();
+      gid('sf-dur').value=s.duration||'30 min';
+      gid('sf-num').value=s.num||'1';
+      gid('sf-str').value=s.stretches||'';
+      gid('sf-notes').value=s.notes||'';
+    }
+  }else{
+    gid('m-ses-t').textContent='Add Session';
+    gid('sf-date').value=today();gid('sf-dur').value='30 min';gid('sf-num').value=ex.length+1;gid('sf-str').value=c.stretches||'';gid('sf-notes').value='';
+  }
   openModal('m-ses');
 }
 function saveSes(){
   var cid=gid('sf-cid').value,date=gid('sf-date').value;
+  var sid=gid('sf-sid').value;
   if(!date){alert('Date required');return;}
-  var s={id:'s'+Date.now(),clientId:String(cid),date:date,duration:gid('sf-dur').value,num:gid('sf-num').value||'1',stretches:gid('sf-str').value,notes:gid('sf-notes').value};
-  if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
-  closeModal('m-ses');renderList();saveToSheets();toast('Saved');
+  if(sid){
+    var arr=sessions[cid]||[];
+    for(var i=0;i<arr.length;i++){
+      if(String(arr[i].id)===String(sid)){
+        arr[i].date=date;
+        arr[i].duration=gid('sf-dur').value;
+        arr[i].num=gid('sf-num').value||'1';
+        arr[i].stretches=gid('sf-str').value;
+        arr[i].notes=gid('sf-notes').value;
+        break;
+      }
+    }
+    closeModal('m-ses');renderList();saveToSheets();toast('Session updated');
+  }else{
+    var s={id:'s'+Date.now(),clientId:String(cid),date:date,duration:gid('sf-dur').value,num:gid('sf-num').value||'1',stretches:gid('sf-str').value,notes:gid('sf-notes').value};
+    if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
+    closeModal('m-ses');renderList();saveToSheets();toast('Session added');
+  }
 }
 function delSes(cid,sid){
   if(!confirm('Delete?'))return;
@@ -595,6 +634,7 @@ document.addEventListener('click',function(ev){
       if(t.dataset.addses){openSes(t.dataset.addses);return;}
       if(t.dataset.pay){openPay(t.dataset.pay);return;}
       if(t.dataset.rmmeas){var p=t.dataset.rmmeas.split('|');delMeas(p[0],p[1]);return;}
+      if(t.dataset.editses){var pe=t.dataset.editses.split('|');openSes(pe[0],pe[1]);return;}
       if(t.dataset.rmses){var p2=t.dataset.rmses.split('|');delSes(p2[0],p2[1]);return;}
       if(t.dataset.paydl){var p3=t.dataset.paydl.split('|');downloadPay(p3[0],p3[1]);return;}
       if(t.dataset.paydel){var p4=t.dataset.paydel.split('|');delPay(p4[0],p4[1]);return;}
@@ -615,6 +655,7 @@ document.addEventListener('DOMContentLoaded',function(){
     var k=gid('pf-pkg').value;
     if(PKG[k]){gid('pf-sess').value=PKG[k].sessions;gid('pf-amt').value=PKG[k].price;gid('pf-desc').value=PKG[k].sessions+' Sessions x 30 mins';}
   });
+  preloadLogo();
   renderBody();
   refreshAnalyzer();
   loadFromSheets();
