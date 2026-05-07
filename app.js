@@ -7,6 +7,31 @@ var lastDiag=null;
 
 var LOGO_URL='9E6DC135-0C7C-4D3C-A50D-143B7950C0E0.png';
 var LOGO_DATA=null;
+
+function drawLogoWithBlend(doc,x,y,w,h){
+  // Draw the logo
+  if(LOGO_DATA){
+    try{doc.addImage(LOGO_DATA,'PNG',x,y,w,h);}catch(e){}
+  }
+}
+function drawHeaderGradient(doc,pageW,headerH,centerX,centerY,radius){
+  // Create a soft vignette effect by drawing concentric circles with decreasing opacity
+  // from dark (center) to fully dark at edges
+  // jsPDF supports setting GState for opacity
+  var steps=20;
+  for(var i=steps;i>0;i--){
+    var t=i/steps;
+    var r=radius+(pageW-radius)*t*0.6;
+    var opacity=1-(1-t)*0.7;
+    try{
+      doc.setGState(new doc.GState({opacity:opacity}));
+    }catch(e){}
+    doc.setFillColor(11,10,30);
+    doc.circle(centerX,centerY,r,'F');
+  }
+  try{doc.setGState(new doc.GState({opacity:1}));}catch(e){}
+}
+
 function preloadLogo(){
   var img=new Image();
   img.crossOrigin='anonymous';
@@ -237,8 +262,26 @@ function exportDiagPDF(){
   var doc=new jsPDF();
   var pageW=210,margin=15,y=20;
   var d=lastDiag;
-  doc.setFillColor(11,10,30);doc.rect(0,0,pageW,30,'F');
-  if(LOGO_DATA){try{doc.addImage(LOGO_DATA,'PNG',margin,4,22,22);doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin+26,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin+26,22);}catch(e){doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);}}
+  // Header background with smooth gradient
+  doc.setFillColor(11,10,30);doc.rect(0,0,210,32,'F');
+  if(LOGO_DATA){
+    try{
+      // Soft glow halo around logo
+      var dlcx=margin+11,dlcy=15,dlr=12;
+      for(var dgi=8;dgi>0;dgi--){
+        var dgt=dgi/8;
+        try{doc.setGState(new doc.GState({opacity:0.08*dgt}));}catch(eg){}
+        doc.setFillColor(80,40,120);
+        doc.circle(dlcx,dlcy,dlr+dgi*2,'F');
+      }
+      try{doc.setGState(new doc.GState({opacity:1}));}catch(eg){}
+      doc.addImage(LOGO_DATA,'PNG',margin,2,26,26);
+      doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin+30,15);
+      doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin+30,22);
+    }catch(e){
+      doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);
+    }
+  }
   else{doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);}
   y=42;
   doc.setTextColor(0,0,0);doc.setFontSize(13);doc.setFont(undefined,'bold');
@@ -307,8 +350,26 @@ function generateInvoicePDF(p,c){
   var pageW=210,margin=15;
   var lang=p.language||'en';
   var t=INVOICE_TXT[lang];
+  // Header background with smooth gradient
   doc.setFillColor(11,10,30);doc.rect(0,0,pageW,75,'F');
-  if(LOGO_DATA){try{doc.addImage(LOGO_DATA,'PNG',pageW/2-15,12,30,30);}catch(e){doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('+',pageW/2,35,{align:'center'});}}
+  if(LOGO_DATA){
+    try{
+      // Add subtle radial gradient effect - draw soft circles around where logo will be
+      var lcx=pageW/2,lcy=27,lr=20;
+      // Create blend halos with decreasing opacity from center outward
+      for(var gi=8;gi>0;gi--){
+        var gt=gi/8;
+        try{doc.setGState(new doc.GState({opacity:0.08*gt}));}catch(eg){}
+        doc.setFillColor(80,40,120);
+        doc.circle(lcx,lcy,lr+gi*4,'F');
+      }
+      try{doc.setGState(new doc.GState({opacity:1}));}catch(eg){}
+      // Now add logo on top - sized to blend naturally
+      doc.addImage(LOGO_DATA,'PNG',pageW/2-22,5,44,44);
+    }catch(e){
+      doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('+',pageW/2,35,{align:'center'});
+    }
+  }
   else{doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('+',pageW/2,35,{align:'center'});}
   doc.setFontSize(28);doc.setTextColor(236,72,153);
   doc.text(t.invoice,pageW/2,58,{align:'center'});
