@@ -8,11 +8,29 @@ var lastDiag=null;
 var LOGO_URL='9E6DC135-0C7C-4D3C-A50D-143B7950C0E0.png';
 var LOGO_DATA=null;
 function preloadLogo(){
-  fetch(LOGO_URL).then(function(r){return r.blob();}).then(function(blob){
-    var reader=new FileReader();
-    reader.onload=function(){LOGO_DATA=reader.result;};
-    reader.readAsDataURL(blob);
-  }).catch(function(){});
+  var img=new Image();
+  img.crossOrigin='anonymous';
+  img.onload=function(){
+    try{
+      var canvas=document.createElement('canvas');
+      canvas.width=img.naturalWidth;
+      canvas.height=img.naturalHeight;
+      var ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0);
+      LOGO_DATA=canvas.toDataURL('image/png');
+      console.log('Logo loaded for PDFs');
+    }catch(e){
+      console.log('Logo canvas error:',e);
+      // Fallback to fetch method
+      fetch(LOGO_URL).then(function(r){return r.blob();}).then(function(blob){
+        var reader=new FileReader();
+        reader.onload=function(){LOGO_DATA=reader.result;};
+        reader.readAsDataURL(blob);
+      }).catch(function(){});
+    }
+  };
+  img.onerror=function(){console.log('Logo failed to load');};
+  img.src=LOGO_URL+'?t='+Date.now();
 }
 
 var PKG={elite:{label:'Elite - 12/mo',cls:'pk-elite',price:480,sessions:12},intensive:{label:'Intensive - 8/mo',cls:'pk-intensive',price:360,sessions:8},basic:{label:'Basic - 4/mo',cls:'pk-basic',price:200,sessions:4},maintenance:{label:'Maintenance - 2/mo',cls:'pk-maintenance',price:120,sessions:2}};
@@ -441,10 +459,10 @@ function renderDetail(id){
   if(cSess.length){
     for(var si=0;si<cSess.length;si++){
       var ss=cSess[si];
-      h+='<div class="ses"><div class="ses-h" data-toggleses="'+si+'"><div><div class="ses-d">'+fmtDate(ss.date)+'</div><div class="ses-n">Session #'+esc(ss.num||'')+' - '+esc(ss.duration||'30 min')+'</div></div><span style="color:var(--dgray)">v</span></div><div class="ses-body" id="sb-'+si+'">';
+      h+='<div class="ses"><div class="ses-h"><div data-toggleses="'+si+'" style="flex:1;cursor:pointer"><div class="ses-d">'+fmtDate(ss.date)+'</div><div class="ses-n">Session #'+esc(ss.num||'')+' - '+esc(ss.duration||'30 min')+'</div></div><div style="display:flex;gap:6px;align-items:center"><button data-editses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:transparent;border:1px solid var(--violet);color:#a78bfa;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:Outfit;font-weight:700">Edit</button><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:transparent;border:1px solid var(--red);color:var(--red);font-size:11px;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:Outfit;font-weight:700">Delete</button><span data-toggleses="'+si+'" style="color:var(--dgray);cursor:pointer;padding:0 4px">v</span></div></div><div class="ses-body" id="sb-'+si+'">';
       if(ss.stretches)h+='<p style="font-size:12px;color:var(--lgray);white-space:pre-wrap;margin-bottom:8px"><b>Stretches:</b> '+esc(ss.stretches)+'</p>';
       if(ss.notes)h+='<p style="font-size:12px;color:var(--lgray);margin-bottom:8px"><b>Notes:</b> '+esc(ss.notes)+'</p>';
-      h+='<div style="display:flex;justify-content:flex-end;gap:8px"><button data-editses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:transparent;border:1px solid var(--violet);color:#a78bfa;font-size:11px;cursor:pointer;padding:4px 10px;border-radius:6px;font-family:Outfit;font-weight:700">Edit</button><button data-rmses="'+esc(c.id)+'|'+esc(ss.id)+'" type="button" style="background:0;border:0;color:var(--red);font-size:11px;cursor:pointer">Delete</button></div></div></div>';
+      h+='</div></div>';
     }
   }else h+='<div style="text-align:center;padding:20px;color:var(--dgray);font-size:12px">No sessions yet.</div>';
   gid('detail').innerHTML=h;
