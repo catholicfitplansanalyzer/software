@@ -473,9 +473,9 @@ function renderDetail(id){
   h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'" type="button">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'" type="button">Delete</button></div></div>';
   var st=getStatus(c);
   if(st){
-    if(st.status==='expired')h+='<div class="alert-banner"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+st.done+'/'+st.total+' sessions completed.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div>';
-    else if(st.status==='warning')h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+st.done+'/'+st.total+' completed.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div>';
-    else h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)"><h3 style="color:var(--green);margin-bottom:0">Package Progress: '+st.done+'/'+st.total+' sessions</h3></div>';
+    if(st.status==='expired')h+='<div class="alert-banner"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+st.done+'/'+st.total+' sessions completed.</p></div><div style="display:flex;gap:6px;align-items:center"><button data-decses="'+esc(c.id)+'" type="button" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit">-</button><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div></div>';
+    else if(st.status==='warning')h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+st.done+'/'+st.total+' completed.</p></div><div style="display:flex;gap:6px;align-items:center"><button data-decses="'+esc(c.id)+'" type="button" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit">-</button><button data-incses="'+esc(c.id)+'" type="button" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit">+</button><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div></div>';
+    else h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="color:var(--green);margin-bottom:0">Package Progress: '+st.done+'/'+st.total+' sessions</h3><div style="display:flex;gap:6px;align-items:center"><button data-decses="'+esc(c.id)+'" type="button" style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:var(--red);font-size:18px;font-weight:700;cursor:pointer;font-family:Outfit">-</button><button data-incses="'+esc(c.id)+'" type="button" style="width:32px;height:32px;border-radius:50%;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--green);font-size:18px;font-weight:700;cursor:pointer;font-family:Outfit">+</button><button data-setses="'+esc(c.id)+'" type="button" style="padding:6px 12px;border-radius:6px;background:transparent;border:1px solid var(--violet);color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit">Set</button></div></div>';
   }
   h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment and Generate Invoice</button>';
   if(cPay.length){
@@ -642,6 +642,69 @@ function renumberSessions(cid,c){
   }
 }
 
+function adjustSessionCount(cid,delta){
+  var c=findClient(cid);if(!c)return;
+  var st=getStatus(c);if(!st)return;
+  var arr=sessions[String(cid)]||[];
+  var pkgStart=c.packageStart?new Date(c.packageStart):null;
+  if(delta>0){
+    // Add a quick session for today
+    var s={id:'s'+Date.now(),clientId:String(cid),date:today(),duration:'30 min',num:'',stretches:'',notes:'(Quick add)'};
+    if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
+    renumberSessions(cid,c);
+  }else if(delta<0){
+    // Remove the most recent session in current package
+    var inPkg=[];
+    for(var i=0;i<arr.length;i++){
+      var s2=arr[i];
+      if(pkgStart&&new Date(s2.date)<pkgStart)continue;
+      inPkg.push(s2);
+    }
+    if(inPkg.length===0){toast('No sessions to remove');return;}
+    inPkg.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var toRemove=inPkg[0];
+    sessions[cid]=arr.filter(function(x){return String(x.id)!==String(toRemove.id);});
+    renumberSessions(cid,c);
+  }
+  renderList();saveToSheets();
+}
+
+function setSessionCount(cid){
+  var c=findClient(cid);if(!c)return;
+  var st=getStatus(c);if(!st)return;
+  var input=prompt('How many completed sessions? (0-'+st.total+')',st.done);
+  if(input===null)return;
+  var target=parseInt(input);
+  if(isNaN(target)||target<0||target>st.total){alert('Invalid number');return;}
+  var current=st.done;
+  var diff=target-current;
+  if(diff===0)return;
+  var arr=sessions[String(cid)]||[];
+  var pkgStart=c.packageStart?new Date(c.packageStart):null;
+  if(diff>0){
+    // Add diff sessions
+    for(var i=0;i<diff;i++){
+      var s={id:'s'+(Date.now()+i),clientId:String(cid),date:today(),duration:'30 min',num:'',stretches:'',notes:'(Quick add)'};
+      if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
+    }
+  }else{
+    // Remove abs(diff) most recent sessions
+    var inPkg=[];
+    for(var j=0;j<arr.length;j++){
+      var s3=arr[j];
+      if(pkgStart&&new Date(s3.date)<pkgStart)continue;
+      inPkg.push(s3);
+    }
+    inPkg.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var toRemoveIds={};
+    for(var k=0;k<Math.abs(diff)&&k<inPkg.length;k++){toRemoveIds[String(inPkg[k].id)]=true;}
+    sessions[cid]=arr.filter(function(x){return !toRemoveIds[String(x.id)];});
+  }
+  renumberSessions(cid,c);
+  renderList();saveToSheets();toast('Updated to '+target+'/'+st.total);
+}
+
+
 function openSes(id,editSid){
   var c=findClient(id);if(!c)return;
   var ex=sessions[String(id)]||[];
@@ -753,6 +816,9 @@ document.addEventListener('click',function(ev){
       if(t.dataset.addses){openSes(t.dataset.addses);return;}
       if(t.dataset.pay){openPay(t.dataset.pay);return;}
       if(t.dataset.rmmeas){var p=t.dataset.rmmeas.split('|');delMeas(p[0],p[1]);return;}
+      if(t.dataset.incses){adjustSessionCount(t.dataset.incses,1);return;}
+      if(t.dataset.decses){adjustSessionCount(t.dataset.decses,-1);return;}
+      if(t.dataset.setses){setSessionCount(t.dataset.setses);return;}
       if(t.dataset.editses){var pe=t.dataset.editses.split('|');openSes(pe[0],pe[1]);return;}
       if(t.dataset.rmses){var p2=t.dataset.rmses.split('|');delSes(p2[0],p2[1]);return;}
       if(t.dataset.paydl){var p3=t.dataset.paydl.split('|');downloadPay(p3[0],p3[1]);return;}
