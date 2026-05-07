@@ -262,27 +262,26 @@ function exportDiagPDF(){
   var doc=new jsPDF();
   var pageW=210,margin=15,y=20;
   var d=lastDiag;
-  // Header background with smooth gradient
-  doc.setFillColor(11,10,30);doc.rect(0,0,210,32,'F');
+  // Header with vertical gradient
+  var dheaderH=32;
+  for(var dgy=0;dgy<dheaderH;dgy++){
+    var dgp=dgy/dheaderH;
+    var dr=Math.round(11+(50-11)*dgp);
+    var dgC=Math.round(10+(30-10)*dgp);
+    var db=Math.round(30+(90-30)*dgp);
+    doc.setFillColor(dr,dgC,db);
+    doc.rect(0,dgy,210,1.5,'F');
+  }
   if(LOGO_DATA){
     try{
-      // Soft glow halo around logo
-      var dlcx=margin+11,dlcy=15,dlr=12;
-      for(var dgi=8;dgi>0;dgi--){
-        var dgt=dgi/8;
-        try{doc.setGState(new doc.GState({opacity:0.08*dgt}));}catch(eg){}
-        doc.setFillColor(80,40,120);
-        doc.circle(dlcx,dlcy,dlr+dgi*2,'F');
-      }
-      try{doc.setGState(new doc.GState({opacity:1}));}catch(eg){}
-      doc.addImage(LOGO_DATA,'PNG',margin,2,26,26);
-      doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin+30,15);
-      doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin+30,22);
+      doc.addImage(LOGO_DATA,'PNG',margin,3,26,26);
+      doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin+30,15);
+      doc.setTextColor(220,200,255);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin+30,22);
     }catch(e){
-      doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);
+      doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(220,200,255);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);
     }
   }
-  else{doc.setTextColor(236,72,153);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(167,139,250);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);}
+  else{doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont(undefined,'bold');doc.text('CatholicFitPlans',margin,15);doc.setTextColor(220,200,255);doc.setFontSize(10);doc.setFont(undefined,'normal');doc.text('Bilateral Mobility Diagnosis Report',margin,22);}
   y=42;
   doc.setTextColor(0,0,0);doc.setFontSize(13);doc.setFont(undefined,'bold');
   doc.text('Client: '+d.clientName,margin,y);y+=6;
@@ -350,22 +349,21 @@ function generateInvoicePDF(p,c){
   var pageW=210,margin=15;
   var lang=p.language||'en';
   var t=INVOICE_TXT[lang];
-  // Header background with smooth gradient
-  doc.setFillColor(11,10,30);doc.rect(0,0,pageW,75,'F');
+  // Header with vertical gradient from dark navy to purple
+  var headerH=75;
+  for(var gy=0;gy<headerH;gy++){
+    var gp=gy/headerH;
+    // Interpolate from RGB(11,10,30) at top to RGB(50,30,90) at bottom
+    var r=Math.round(11+(50-11)*gp);
+    var gC=Math.round(10+(30-10)*gp);
+    var b=Math.round(30+(90-30)*gp);
+    doc.setFillColor(r,gC,b);
+    doc.rect(0,gy,pageW,1.5,'F');
+  }
   if(LOGO_DATA){
     try{
-      // Add subtle radial gradient effect - draw soft circles around where logo will be
-      var lcx=pageW/2,lcy=27,lr=20;
-      // Create blend halos with decreasing opacity from center outward
-      for(var gi=8;gi>0;gi--){
-        var gt=gi/8;
-        try{doc.setGState(new doc.GState({opacity:0.08*gt}));}catch(eg){}
-        doc.setFillColor(80,40,120);
-        doc.circle(lcx,lcy,lr+gi*4,'F');
-      }
-      try{doc.setGState(new doc.GState({opacity:1}));}catch(eg){}
-      // Now add logo on top - sized to blend naturally
-      doc.addImage(LOGO_DATA,'PNG',pageW/2-22,5,44,44);
+      // Logo centered, no halo - the gradient itself blends nicely
+      doc.addImage(LOGO_DATA,'PNG',pageW/2-22,8,44,44);
     }catch(e){
       doc.setFillColor(236,72,153);doc.circle(pageW/2,30,14,'F');doc.setTextColor(255,255,255);doc.setFontSize(20);doc.setFont(undefined,'bold');doc.text('+',pageW/2,35,{align:'center'});
     }
@@ -400,8 +398,6 @@ function generateInvoicePDF(p,c){
   doc.text(t.total+':',margin+95,y+2);
   doc.setTextColor(236,72,153);
   doc.text('$'+Number(p.amount||0).toFixed(2),pageW-margin-3,y+2,{align:'right'});
-  doc.setTextColor(139,92,246);doc.setFont(undefined,'italic');doc.setFontSize(11);
-  doc.text(t.thanks,pageW/2,y+25,{align:'center'});
   doc.setTextColor(150,150,150);doc.setFont(undefined,'normal');doc.setFontSize(8);
   doc.text(t.footer,pageW/2,285,{align:'center'});
   return doc;
@@ -411,7 +407,15 @@ function downloadInvoice(p,c){var doc=generateInvoicePDF(p,c);doc.save('Invoice-
 function getStatus(c){
   if(!c.package||!PKG[c.package])return null;
   var total=PKG[c.package].sessions;
-  var done=(sessions[c.id]||[]).filter(function(s){return c.packageStart?new Date(s.date)>=new Date(c.packageStart):true;}).length;
+  // Count chronologically: sessions with date >= packageStart
+  var arr=sessions[c.id]||[];
+  var pkgStart=c.packageStart?new Date(c.packageStart):null;
+  var done=0;
+  for(var i=0;i<arr.length;i++){
+    var s=arr[i];
+    if(pkgStart&&new Date(s.date)<pkgStart)continue;
+    done++;
+  }
   var rem=total-done;
   return{total:total,done:done,rem:rem,status:rem<=0?'expired':rem===1?'warning':'ok'};
 }
@@ -608,6 +612,36 @@ function delMeas(cid,mid){
   renderDetail(cid);saveToSheets();
 }
 
+function getNextSessionNumber(cid,c){
+  // Count sessions in current package chronologically
+  var arr=sessions[String(cid)]||[];
+  var pkgStart=c&&c.packageStart?new Date(c.packageStart):null;
+  var count=0;
+  for(var i=0;i<arr.length;i++){
+    var s=arr[i];
+    if(pkgStart&&new Date(s.date)<pkgStart)continue;
+    count++;
+  }
+  return count+1;
+}
+
+function renumberSessions(cid,c){
+  // Renumber all sessions chronologically by date
+  var arr=sessions[String(cid)]||[];
+  var pkgStart=c&&c.packageStart?new Date(c.packageStart):null;
+  // Get sessions in current package, sort by date ascending
+  var inPkg=[];
+  for(var i=0;i<arr.length;i++){
+    var s=arr[i];
+    if(pkgStart&&new Date(s.date)<pkgStart)continue;
+    inPkg.push(s);
+  }
+  inPkg.sort(function(a,b){return new Date(a.date)-new Date(b.date);});
+  for(var j=0;j<inPkg.length;j++){
+    inPkg[j].num=String(j+1);
+  }
+}
+
 function openSes(id,editSid){
   var c=findClient(id);if(!c)return;
   var ex=sessions[String(id)]||[];
@@ -625,7 +659,9 @@ function openSes(id,editSid){
     }
   }else{
     gid('m-ses-t').textContent='Add Session';
-    gid('sf-date').value=today();gid('sf-dur').value='30 min';gid('sf-num').value=ex.length+1;gid('sf-str').value=c.stretches||'';gid('sf-notes').value='';
+    gid('sf-date').value=today();gid('sf-dur').value='30 min';
+    gid('sf-num').value=getNextSessionNumber(id,c);
+    gid('sf-str').value=c.stretches||'';gid('sf-notes').value='';
   }
   openModal('m-ses');
 }
@@ -633,29 +669,33 @@ function saveSes(){
   var cid=gid('sf-cid').value,date=gid('sf-date').value;
   var sid=gid('sf-sid').value;
   if(!date){alert('Date required');return;}
+  var c=findClient(cid);
   if(sid){
     var arr=sessions[cid]||[];
     for(var i=0;i<arr.length;i++){
       if(String(arr[i].id)===String(sid)){
         arr[i].date=date;
         arr[i].duration=gid('sf-dur').value;
-        arr[i].num=gid('sf-num').value||'1';
         arr[i].stretches=gid('sf-str').value;
         arr[i].notes=gid('sf-notes').value;
         break;
       }
     }
+    renumberSessions(cid,c);
     closeModal('m-ses');renderList();saveToSheets();toast('Session updated');
   }else{
-    var s={id:'s'+Date.now(),clientId:String(cid),date:date,duration:gid('sf-dur').value,num:gid('sf-num').value||'1',stretches:gid('sf-str').value,notes:gid('sf-notes').value};
+    var s={id:'s'+Date.now(),clientId:String(cid),date:date,duration:gid('sf-dur').value,num:'',stretches:gid('sf-str').value,notes:gid('sf-notes').value};
     if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
+    renumberSessions(cid,c);
     closeModal('m-ses');renderList();saveToSheets();toast('Session added');
   }
 }
 function delSes(cid,sid){
   if(!confirm('Delete?'))return;
   sessions[cid]=(sessions[cid]||[]).filter(function(s){return String(s.id)!==String(sid);});
-  renderDetail(cid);saveToSheets();
+  var c=findClient(cid);
+  renumberSessions(cid,c);
+  renderList();saveToSheets();
 }
 
 function openPay(id){
