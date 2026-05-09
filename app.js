@@ -407,15 +407,17 @@ function downloadInvoice(p,c){var doc=generateInvoicePDF(p,c);doc.save('Invoice-
 function getStatus(c){
   if(!c.package||!PKG[c.package])return null;
   var total=PKG[c.package].sessions;
-  // Count chronologically: sessions with date >= packageStart
+  // Use highest session number from current package
   var arr=sessions[c.id]||[];
   var pkgStart=c.packageStart?new Date(c.packageStart):null;
-  var done=0;
+  var maxNum=0;
   for(var i=0;i<arr.length;i++){
     var s=arr[i];
     if(pkgStart&&new Date(s.date)<pkgStart)continue;
-    done++;
+    var n=parseInt(s.num)||0;
+    if(n>maxNum)maxNum=n;
   }
+  var done=maxNum;
   var rem=total-done;
   return{total:total,done:done,rem:rem,status:rem<=0?'expired':rem===1?'warning':'ok'};
 }
