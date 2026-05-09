@@ -407,15 +407,17 @@ function downloadInvoice(p,c){var doc=generateInvoicePDF(p,c);doc.save('Invoice-
 function getStatus(c){
   if(!c.package||!PKG[c.package])return null;
   var total=PKG[c.package].sessions;
-  // Count chronologically: sessions with date >= packageStart
+  // Use highest session number from current package
   var arr=sessions[c.id]||[];
   var pkgStart=c.packageStart?new Date(c.packageStart):null;
-  var done=0;
+  var maxNum=0;
   for(var i=0;i<arr.length;i++){
     var s=arr[i];
     if(pkgStart&&new Date(s.date)<pkgStart)continue;
-    done++;
+    var n=parseInt(s.num)||0;
+    if(n>maxNum)maxNum=n;
   }
+  var done=maxNum;
   var rem=total-done;
   return{total:total,done:done,rem:rem,status:rem<=0?'expired':rem===1?'warning':'ok'};
 }
@@ -473,9 +475,9 @@ function renderDetail(id){
   h+='</div></div><div class="dh-r"><button class="btn-e" data-edit="'+esc(c.id)+'" type="button">Edit</button><button class="btn-d" data-del="'+esc(c.id)+'" type="button">Delete</button></div></div>';
   var st=getStatus(c);
   if(st){
-    if(st.status==='expired')h+='<div class="alert-banner"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+st.done+'/'+st.total+' sessions completed.</p></div><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div>';
-    else if(st.status==='warning')h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+st.done+'/'+st.total+' completed.</p></div><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div>';
-    else h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3)"><h3 style="color:var(--green);margin-bottom:0">Package Progress: '+st.done+'/'+st.total+' sessions</h3></div>';
+    if(st.status==='expired')h+='<div class="alert-banner"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4>Package Completed - Renewal Required</h4><p>'+st.done+'/'+st.total+' sessions completed.</p></div><div style="display:flex;gap:6px;align-items:center"><button data-decses="'+esc(c.id)+'" type="button" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit">-</button><button class="renew-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment</button></div></div>';
+    else if(st.status==='warning')h+='<div class="alert-banner" style="background:rgba(249,115,22,.15);border-color:#f97316"><div class="alert-banner-icon">!</div><div class="alert-banner-text"><h4 style="color:#f97316">1 Session Remaining</h4><p style="color:#fdba74">'+st.done+'/'+st.total+' completed.</p></div><div style="display:flex;gap:6px;align-items:center"><button data-decses="'+esc(c.id)+'" type="button" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit">-</button><button data-incses="'+esc(c.id)+'" type="button" style="width:30px;height:30px;border-radius:50%;background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.3);color:#fff;font-size:16px;font-weight:700;cursor:pointer;font-family:Outfit">+</button><button class="renew-btn" style="background:#f97316" data-pay="'+esc(c.id)+'" type="button">Renew Now</button></div></div>';
+    else h+='<div class="box" style="margin-bottom:14px;background:rgba(52,211,153,.08);border-color:rgba(52,211,153,.3);display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap"><h3 style="color:var(--green);margin-bottom:0">Package Progress: '+st.done+'/'+st.total+' sessions</h3><div style="display:flex;gap:6px;align-items:center"><button data-decses="'+esc(c.id)+'" type="button" style="width:32px;height:32px;border-radius:50%;background:rgba(239,68,68,.15);border:1px solid rgba(239,68,68,.4);color:var(--red);font-size:18px;font-weight:700;cursor:pointer;font-family:Outfit">-</button><button data-incses="'+esc(c.id)+'" type="button" style="width:32px;height:32px;border-radius:50%;background:rgba(52,211,153,.15);border:1px solid rgba(52,211,153,.4);color:var(--green);font-size:18px;font-weight:700;cursor:pointer;font-family:Outfit">+</button><button data-setses="'+esc(c.id)+'" type="button" style="padding:6px 12px;border-radius:6px;background:transparent;border:1px solid var(--violet);color:#a78bfa;font-size:11px;font-weight:700;cursor:pointer;font-family:Outfit">Set</button></div></div>';
   }
   h+='<button class="add-pay-btn" data-pay="'+esc(c.id)+'" type="button">Register Payment and Generate Invoice</button>';
   if(cPay.length){
@@ -642,6 +644,69 @@ function renumberSessions(cid,c){
   }
 }
 
+function adjustSessionCount(cid,delta){
+  var c=findClient(cid);if(!c)return;
+  var st=getStatus(c);if(!st)return;
+  var arr=sessions[String(cid)]||[];
+  var pkgStart=c.packageStart?new Date(c.packageStart):null;
+  if(delta>0){
+    // Add a quick session for today
+    var s={id:'s'+Date.now(),clientId:String(cid),date:today(),duration:'30 min',num:'',stretches:'',notes:'(Quick add)'};
+    if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
+    renumberSessions(cid,c);
+  }else if(delta<0){
+    // Remove the most recent session in current package
+    var inPkg=[];
+    for(var i=0;i<arr.length;i++){
+      var s2=arr[i];
+      if(pkgStart&&new Date(s2.date)<pkgStart)continue;
+      inPkg.push(s2);
+    }
+    if(inPkg.length===0){toast('No sessions to remove');return;}
+    inPkg.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var toRemove=inPkg[0];
+    sessions[cid]=arr.filter(function(x){return String(x.id)!==String(toRemove.id);});
+    renumberSessions(cid,c);
+  }
+  renderList();saveToSheets();
+}
+
+function setSessionCount(cid){
+  var c=findClient(cid);if(!c)return;
+  var st=getStatus(c);if(!st)return;
+  var input=prompt('How many completed sessions? (0-'+st.total+')',st.done);
+  if(input===null)return;
+  var target=parseInt(input);
+  if(isNaN(target)||target<0||target>st.total){alert('Invalid number');return;}
+  var current=st.done;
+  var diff=target-current;
+  if(diff===0)return;
+  var arr=sessions[String(cid)]||[];
+  var pkgStart=c.packageStart?new Date(c.packageStart):null;
+  if(diff>0){
+    // Add diff sessions
+    for(var i=0;i<diff;i++){
+      var s={id:'s'+(Date.now()+i),clientId:String(cid),date:today(),duration:'30 min',num:'',stretches:'',notes:'(Quick add)'};
+      if(!sessions[cid])sessions[cid]=[];sessions[cid].push(s);
+    }
+  }else{
+    // Remove abs(diff) most recent sessions
+    var inPkg=[];
+    for(var j=0;j<arr.length;j++){
+      var s3=arr[j];
+      if(pkgStart&&new Date(s3.date)<pkgStart)continue;
+      inPkg.push(s3);
+    }
+    inPkg.sort(function(a,b){return new Date(b.date)-new Date(a.date);});
+    var toRemoveIds={};
+    for(var k=0;k<Math.abs(diff)&&k<inPkg.length;k++){toRemoveIds[String(inPkg[k].id)]=true;}
+    sessions[cid]=arr.filter(function(x){return !toRemoveIds[String(x.id)];});
+  }
+  renumberSessions(cid,c);
+  renderList();saveToSheets();toast('Updated to '+target+'/'+st.total);
+}
+
+
 function openSes(id,editSid){
   var c=findClient(id);if(!c)return;
   var ex=sessions[String(id)]||[];
@@ -753,6 +818,9 @@ document.addEventListener('click',function(ev){
       if(t.dataset.addses){openSes(t.dataset.addses);return;}
       if(t.dataset.pay){openPay(t.dataset.pay);return;}
       if(t.dataset.rmmeas){var p=t.dataset.rmmeas.split('|');delMeas(p[0],p[1]);return;}
+      if(t.dataset.incses){adjustSessionCount(t.dataset.incses,1);return;}
+      if(t.dataset.decses){adjustSessionCount(t.dataset.decses,-1);return;}
+      if(t.dataset.setses){setSessionCount(t.dataset.setses);return;}
       if(t.dataset.editses){var pe=t.dataset.editses.split('|');openSes(pe[0],pe[1]);return;}
       if(t.dataset.rmses){var p2=t.dataset.rmses.split('|');delSes(p2[0],p2[1]);return;}
       if(t.dataset.paydl){var p3=t.dataset.paydl.split('|');downloadPay(p3[0],p3[1]);return;}
@@ -762,6 +830,428 @@ document.addEventListener('click',function(ev){
     t=t.parentNode;
   }
 });
+
+
+// ============== TRAINING INTAKE MODULE ==============
+var intakes={};
+var currentIntakeId=null;
+
+var PARQ_QUESTIONS=[
+  'Has your doctor ever said that you have a heart condition and that you should only do physical activity recommended by a doctor?',
+  'Do you feel pain in your chest when you do physical activity?',
+  'In the past month, have you had chest pain when you were not doing physical activity?',
+  'Do you lose your balance because of dizziness or do you ever lose consciousness?',
+  'Do you have a bone or joint problem that could be made worse by a change in your physical activity?',
+  'Is your doctor currently prescribing drugs for your blood pressure or heart condition?',
+  'Do you know of any other reason why you should not do physical activity?'
+];
+
+var UBMT_TESTS=['Wrist Extension Left','Wrist Extension Right','Shoulder Abduction Left','Shoulder Abduction Right','Shoulder Flexion Left','Shoulder Flexion Right','Wrist'];
+var LBMT_TESTS=['Standing Lumbo Pelvic Flexion','Ankle Dorsiflexion Left','Ankle Dorsiflexion Right','Kneeling Butt to Heel','Prone Butt to Heel Left','Prone Butt to Heel Right','Supine Hip Flexion Left','Supine Hip Flexion Right'];
+
+var EVAL_ROUTINES={
+  young:{label:'Young Adults (18-35)',exercises:[
+    {name:'Burpees',unit:'reps in 60s',type:'number'},
+    {name:'Squats',unit:'reps in 60s',type:'number'},
+    {name:'Push-ups',unit:'reps in 60s',type:'number'},
+    {name:'Plank',unit:'max seconds',type:'number'},
+    {name:'Vertical Jump',unit:'cm',type:'number'},
+    {name:'Single Leg Balance (eyes closed)',unit:'seconds',type:'number'},
+    {name:'Sit & Reach',unit:'cm past toes',type:'number'}
+  ]},
+  adult:{label:'Adults (36-55)',exercises:[
+    {name:'Squats',unit:'reps in 60s',type:'number'},
+    {name:'Push-ups (knees ok)',unit:'reps in 60s',type:'number'},
+    {name:'Plank',unit:'max seconds',type:'number'},
+    {name:'Step-ups (40cm)',unit:'reps in 60s',type:'number'},
+    {name:'Single Leg Balance (eyes open)',unit:'seconds',type:'number'},
+    {name:'Sit & Reach',unit:'cm past toes',type:'number'},
+    {name:'6 Minute Walk',unit:'meters',type:'number'}
+  ]},
+  senior:{label:'Seniors (56-70)',exercises:[
+    {name:'Chair Sit-to-Stand',unit:'reps in 30s',type:'number'},
+    {name:'Bicep Curl (light dumbbell)',unit:'reps in 30s',type:'number'},
+    {name:'Marching in Place',unit:'reps in 2 min',type:'number'},
+    {name:'Back Scratch (shoulder flex)',unit:'cm gap',type:'number'},
+    {name:'Sit & Reach (seated)',unit:'reach to ankle Y/N',type:'text'},
+    {name:'Single Leg Balance (support ok)',unit:'seconds',type:'number'},
+    {name:'TUG (Timed Up and Go)',unit:'seconds',type:'number'}
+  ]},
+  elder:{label:'Older Adults (70+)',exercises:[
+    {name:'Chair Sit-to-Stand',unit:'reps in 30s',type:'number'},
+    {name:'Bicep Curl (very light)',unit:'reps in 30s',type:'number'},
+    {name:'Marching in Place (with support)',unit:'reps in 2 min',type:'number'},
+    {name:'Back Scratch',unit:'cm gap',type:'number'},
+    {name:'Balance (feet together)',unit:'seconds',type:'number'},
+    {name:'TUG (Timed Up and Go)',unit:'seconds',type:'number'},
+    {name:'6 Minute Walk (with support)',unit:'meters',type:'number'}
+  ]}
+};
+
+function getEvalRoutineKey(age){
+  age=parseInt(age)||0;
+  if(age<=0)return null;
+  if(age<=35)return 'young';
+  if(age<=55)return 'adult';
+  if(age<=70)return 'senior';
+  return 'elder';
+}
+
+function buildPARQ(){
+  var c=gid('parq-container');
+  var h='';
+  for(var i=0;i<PARQ_QUESTIONS.length;i++){
+    h+='<div style="display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-bottom:1px solid var(--border)">';
+    h+='<div style="flex:1;font-size:12px;color:var(--lgray);line-height:1.5"><strong style="color:#fff">'+(i+1)+'.</strong> '+PARQ_QUESTIONS[i]+'</div>';
+    h+='<div style="display:flex;gap:8px;flex-shrink:0">';
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--green);cursor:pointer"><input type="radio" name="parq'+i+'" value="yes" style="cursor:pointer"/> Yes</label>';
+    h+='<label style="display:flex;align-items:center;gap:4px;font-size:11px;color:var(--red);cursor:pointer"><input type="radio" name="parq'+i+'" value="no" style="cursor:pointer"/> No</label>';
+    h+='</div></div>';
+  }
+  c.innerHTML=h;
+}
+
+function buildMovementTest(containerId,tests,prefix){
+  var c=gid(containerId);
+  var h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+  h+='<thead><tr style="background:var(--card2)"><th style="padding:8px;text-align:left;color:var(--dgray);font-weight:700;letter-spacing:.05em">TEST</th><th style="padding:8px;color:var(--dgray);font-weight:700">FULL</th><th style="padding:8px;color:var(--dgray);font-weight:700">LIMITED (in)</th><th style="padding:8px;color:var(--dgray);font-weight:700">DISCOMFORT</th><th style="padding:8px;text-align:left;color:var(--dgray);font-weight:700">NOTES</th></tr></thead><tbody>';
+  for(var i=0;i<tests.length;i++){
+    var n=tests[i];
+    var key=prefix+i;
+    h+='<tr style="border-top:1px solid var(--border)">';
+    h+='<td style="padding:8px;font-weight:600;min-width:130px">'+n+'</td>';
+    h+='<td style="padding:8px;text-align:center"><label style="display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px"><input type="radio" name="'+key+'-full" value="yes"/> <span style="color:var(--green)">Yes</span></label><label style="display:flex;flex-direction:column;align-items:center;gap:3px;font-size:10px;margin-top:4px"><input type="radio" name="'+key+'-full" value="no"/> <span style="color:var(--red)">No</span></label></td>';
+    h+='<td style="padding:8px;text-align:center"><input type="number" step="0.5" id="'+key+'-limited" style="width:55px;background:var(--card2);border:1px solid var(--border2);border-radius:5px;padding:4px;color:#fff;font-size:11px;text-align:center"/></td>';
+    h+='<td style="padding:8px"><div style="display:flex;flex-direction:column;gap:3px;font-size:10px"><label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="'+key+'-pinch"/> Pinch</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="'+key+'-pull"/> Pull</label><label style="display:flex;align-items:center;gap:4px;cursor:pointer"><input type="checkbox" id="'+key+'-stretch"/> Stretch</label></div></td>';
+    h+='<td style="padding:8px"><input type="text" id="'+key+'-notes" placeholder="Notes..." style="width:100%;min-width:120px;background:var(--card2);border:1px solid var(--border2);border-radius:5px;padding:5px;color:#fff;font-size:11px"/></td>';
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+  c.innerHTML=h;
+}
+
+function buildEvalRoutine(){
+  var age=parseInt(gid('ik-age').value)||0;
+  var key=getEvalRoutineKey(age);
+  var lbl=gid('eval-age-label');
+  var c=gid('eval-container');
+  if(!key){
+    lbl.textContent='(enter age first)';
+    c.innerHTML='<p style="font-size:11px;color:var(--dgray);font-style:italic;padding:14px 0">Routine will appear after entering age</p>';
+    return;
+  }
+  var routine=EVAL_ROUTINES[key];
+  lbl.textContent='- '+routine.label;
+  var h='<div style="overflow-x:auto"><table style="width:100%;border-collapse:collapse;font-size:11px">';
+  h+='<thead><tr style="background:var(--card2)"><th style="padding:8px;text-align:left;color:var(--dgray);font-weight:700">EXERCISE</th><th style="padding:8px;color:var(--dgray);font-weight:700">UNIT</th><th style="padding:8px;color:var(--dgray);font-weight:700">RESULT</th><th style="padding:8px;text-align:left;color:var(--dgray);font-weight:700">NOTES</th></tr></thead><tbody>';
+  for(var i=0;i<routine.exercises.length;i++){
+    var ex=routine.exercises[i];
+    h+='<tr style="border-top:1px solid var(--border)">';
+    h+='<td style="padding:8px;font-weight:600;min-width:160px">'+(i+1)+'. '+ex.name+'</td>';
+    h+='<td style="padding:8px;color:var(--dgray);font-size:10px">'+ex.unit+'</td>';
+    h+='<td style="padding:8px"><input type="'+(ex.type==='number'?'number':'text')+'" id="eval-'+i+'-result" style="width:80px;background:var(--card2);border:1px solid var(--border2);border-radius:5px;padding:5px;color:#fff;font-size:11px"/></td>';
+    h+='<td style="padding:8px"><input type="text" id="eval-'+i+'-notes" placeholder="..." style="width:100%;min-width:120px;background:var(--card2);border:1px solid var(--border2);border-radius:5px;padding:5px;color:#fff;font-size:11px"/></td>';
+    h+='</tr>';
+  }
+  h+='</tbody></table></div>';
+  c.innerHTML=h;
+}
+
+function calcBMI(){
+  var h=parseFloat(gid('ik-height').value)||0;
+  var w=parseFloat(gid('ik-weight').value)||0;
+  if(h>0&&w>0){var bmi=w/((h/100)*(h/100));gid('ik-bmi').value=bmi.toFixed(1);}
+  else gid('ik-bmi').value='';
+}
+
+function clearIntakeForm(){
+  currentIntakeId=null;
+  var fields=['ik-name','ik-age','ik-sex','ik-phone','ik-email','ik-height','ik-weight','ik-bmi','ik-goal','ik-loc','ik-days','ik-time','ik-injuries','ik-surgeries','ik-meds','ik-limits','ik-plank','ik-obs','ik-focus','ik-fm-sched'];
+  for(var i=0;i<fields.length;i++){var el=gid(fields[i]);if(el)el.value='';}
+  gid('ik-date').value=today();
+  // Clear PARQ
+  for(var i=0;i<PARQ_QUESTIONS.length;i++){
+    var radios=document.getElementsByName('parq'+i);
+    for(var r=0;r<radios.length;r++)radios[r].checked=false;
+  }
+  // Clear movement tests
+  ['u','l'].forEach(function(prefix){
+    var tests=prefix==='u'?UBMT_TESTS:LBMT_TESTS;
+    for(var i=0;i<tests.length;i++){
+      var key=prefix+i;
+      var radios=document.getElementsByName(key+'-full');
+      for(var r=0;r<radios.length;r++)radios[r].checked=false;
+      ['limited','pinch','pull','stretch','notes'].forEach(function(s){
+        var el=gid(key+'-'+s);if(el){if(el.type==='checkbox')el.checked=false;else el.value='';}
+      });
+    }
+  });
+  buildEvalRoutine();
+}
+
+function collectIntake(){
+  var data={
+    id:currentIntakeId||('i'+Date.now()),
+    name:gid('ik-name').value,
+    date:gid('ik-date').value||today(),
+    age:gid('ik-age').value,
+    sex:gid('ik-sex').value,
+    phone:gid('ik-phone').value,
+    email:gid('ik-email').value,
+    height:gid('ik-height').value,
+    weight:gid('ik-weight').value,
+    bmi:gid('ik-bmi').value,
+    goal:gid('ik-goal').value,
+    location:gid('ik-loc').value,
+    days:gid('ik-days').value,
+    time:gid('ik-time').value,
+    injuries:gid('ik-injuries').value,
+    surgeries:gid('ik-surgeries').value,
+    medications:gid('ik-meds').value,
+    limitations:gid('ik-limits').value,
+    plank:gid('ik-plank').value,
+    observations:gid('ik-obs').value,
+    focus:gid('ik-focus').value,
+    fmScheduled:gid('ik-fm-sched').value,
+    parq:[],
+    upperBody:[],
+    lowerBody:[],
+    evaluation:[]
+  };
+  // PARQ
+  for(var i=0;i<PARQ_QUESTIONS.length;i++){
+    var radios=document.getElementsByName('parq'+i);
+    var v='';
+    for(var r=0;r<radios.length;r++)if(radios[r].checked)v=radios[r].value;
+    data.parq.push({question:PARQ_QUESTIONS[i],answer:v});
+  }
+  // Movement tests
+  ['u','l'].forEach(function(prefix){
+    var tests=prefix==='u'?UBMT_TESTS:LBMT_TESTS;
+    var arr=prefix==='u'?data.upperBody:data.lowerBody;
+    for(var i=0;i<tests.length;i++){
+      var key=prefix+i;
+      var radios=document.getElementsByName(key+'-full');
+      var full='';
+      for(var r=0;r<radios.length;r++)if(radios[r].checked)full=radios[r].value;
+      arr.push({
+        test:tests[i],
+        full:full,
+        limited:gid(key+'-limited').value,
+        pinch:gid(key+'-pinch').checked,
+        pull:gid(key+'-pull').checked,
+        stretch:gid(key+'-stretch').checked,
+        notes:gid(key+'-notes').value
+      });
+    }
+  });
+  // Evaluation routine
+  var key=getEvalRoutineKey(data.age);
+  if(key){
+    var routine=EVAL_ROUTINES[key];
+    data.evalAgeGroup=routine.label;
+    for(var i=0;i<routine.exercises.length;i++){
+      var ex=routine.exercises[i];
+      data.evaluation.push({
+        exercise:ex.name,
+        unit:ex.unit,
+        result:gid('eval-'+i+'-result')?gid('eval-'+i+'-result').value:'',
+        notes:gid('eval-'+i+'-notes')?gid('eval-'+i+'-notes').value:''
+      });
+    }
+  }
+  return data;
+}
+
+function saveIntake(){
+  var data=collectIntake();
+  if(!data.name||!data.name.trim()){alert('Please enter client name');return;}
+  // Save intake
+  intakes[data.id]=data;
+  currentIntakeId=data.id;
+  // Create or update client in agenda
+  var existing=null;
+  for(var i=0;i<clients.length;i++){
+    if(String(clients[i].name).toLowerCase().trim()===String(data.name).toLowerCase().trim()){existing=clients[i];break;}
+  }
+  if(!existing){
+    var newClient={
+      id:'c'+Date.now(),
+      name:data.name,
+      email:data.email,
+      phone:data.phone,
+      age:data.age,
+      start:data.date,
+      package:'',
+      packageStart:'',
+      hipL:'',hipR:'',hamL:'',hamR:'',quadL:'',quadR:'',
+      muscles:'',
+      stretches:'',
+      notes:'Intake completed on '+data.date+'\nGoal: '+data.goal+'\nLocation: '+data.location
+    };
+    clients.push(newClient);
+    data.clientId=newClient.id;
+    toast('Client created and intake saved');
+  }else{
+    data.clientId=existing.id;
+    toast('Intake saved (client already exists)');
+  }
+  saveToSheets();
+  saveIntakeToSheets(data);
+  renderList();
+}
+
+function saveIntakeToSheets(data){
+  // Send intake data to Apps Script with action=saveIntake
+  fetch(API_URL,{
+    method:'POST',
+    body:JSON.stringify({action:'saveIntake',payload:data})
+  }).then(function(r){return r.json();}).then(function(resp){
+    if(resp.success)console.log('Intake saved to Sheets');
+    else console.log('Intake save failed:',resp);
+  }).catch(function(err){console.log('Intake save error:',err);});
+}
+
+function loadExistingIntake(){
+  if(clients.length===0){alert('No clients yet');return;}
+  var names=clients.map(function(c){return c.name;}).join('\n');
+  var name=prompt('Type client name to load:\n\n'+names);
+  if(!name)return;
+  var c=null;
+  for(var i=0;i<clients.length;i++){
+    if(String(clients[i].name).toLowerCase().indexOf(name.toLowerCase())>=0){c=clients[i];break;}
+  }
+  if(!c){alert('Client not found');return;}
+  // Pre-fill what we have
+  clearIntakeForm();
+  gid('ik-name').value=c.name||'';
+  gid('ik-age').value=c.age||'';
+  gid('ik-phone').value=c.phone||'';
+  gid('ik-email').value=c.email||'';
+  buildEvalRoutine();
+  toast('Loaded '+c.name);
+}
+
+function exportIntakePDF(){
+  var data=collectIntake();
+  if(!data.name){alert('Please enter client name first');return;}
+  var jsPDF=window.jspdf.jsPDF;
+  var doc=new jsPDF();
+  var pageW=210,margin=15,y=20;
+  // Header gradient
+  var headerH=32;
+  for(var gy=0;gy<headerH;gy++){
+    var gp=gy/headerH;
+    var r=Math.round(11+(50-11)*gp);
+    var gC=Math.round(10+(30-10)*gp);
+    var b=Math.round(30+(90-30)*gp);
+    doc.setFillColor(r,gC,b);
+    doc.rect(0,gy,pageW,1.5,'F');
+  }
+  if(LOGO_DATA){try{doc.addImage(LOGO_DATA,'PNG',margin,3,26,26);}catch(e){}}
+  doc.setTextColor(255,255,255);doc.setFontSize(18);doc.setFont(undefined,'bold');
+  doc.text('Training Intake Form',margin+30,15);
+  doc.setTextColor(220,200,255);doc.setFontSize(10);doc.setFont(undefined,'normal');
+  doc.text('CatholicFitPlans - Initial Assessment',margin+30,22);
+  y=42;
+  doc.setTextColor(0,0,0);doc.setFontSize(13);doc.setFont(undefined,'bold');
+  doc.text('Client: '+data.name,margin,y);y+=6;
+  doc.setFontSize(10);doc.setFont(undefined,'normal');
+  doc.text('Date: '+fmtDate(data.date),margin,y);
+  if(data.age)doc.text('Age: '+data.age,margin+60,y);
+  if(data.sex)doc.text('Sex: '+(data.sex==='F'?'Female':'Male'),margin+90,y);
+  y+=10;
+  // Section helper
+  function section(title){
+    if(y>260){doc.addPage();y=20;}
+    doc.setFillColor(30,28,74);doc.rect(margin,y-4,pageW-margin*2,8,'F');
+    doc.setTextColor(255,255,255);doc.setFontSize(11);doc.setFont(undefined,'bold');
+    doc.text(title,margin+3,y+2);y+=10;
+    doc.setTextColor(0,0,0);doc.setFontSize(9);doc.setFont(undefined,'normal');
+  }
+  function row(label,val){
+    if(!val)return;
+    if(y>275){doc.addPage();y=20;}
+    doc.setFont(undefined,'bold');doc.text(label+':',margin+3,y);
+    doc.setFont(undefined,'normal');
+    var lines=doc.splitTextToSize(String(val),pageW-margin*2-50);
+    doc.text(lines,margin+45,y);y+=Math.max(5,lines.length*4);
+  }
+  section('1. Basic Information');
+  row('Phone',data.phone);row('Email',data.email);
+  if(data.height||data.weight)row('Height/Weight',(data.height?data.height+' cm':'')+(data.weight?' / '+data.weight+' kg':'')+(data.bmi?' (BMI '+data.bmi+')':''));
+  row('Goal',data.goal);row('Location',data.location);
+  row('Schedule',data.days?data.days+' days/week, '+(data.time||''):'');
+  y+=4;
+  section('2. PAR-Q');
+  for(var i=0;i<data.parq.length;i++){
+    if(y>270){doc.addPage();y=20;}
+    var p=data.parq[i];
+    doc.setFont(undefined,'bold');doc.text((i+1)+'. ',margin+3,y);
+    doc.setFont(undefined,'normal');
+    var lines=doc.splitTextToSize(p.question,pageW-margin*2-30);
+    doc.text(lines,margin+9,y);
+    var ans=p.answer?p.answer.toUpperCase():'-';
+    doc.setFont(undefined,'bold');
+    doc.setTextColor(p.answer==='yes'?239:p.answer==='no'?52:0,p.answer==='yes'?68:p.answer==='no'?211:0,p.answer==='yes'?68:p.answer==='no'?153:0);
+    doc.text(ans,pageW-margin-3,y,{align:'right'});
+    doc.setTextColor(0,0,0);doc.setFont(undefined,'normal');
+    y+=Math.max(5,lines.length*4)+2;
+  }
+  y+=2;
+  if(data.injuries||data.surgeries||data.medications||data.limitations){
+    section('3. Medical History');
+    row('Injuries',data.injuries);row('Surgeries',data.surgeries);
+    row('Medications',data.medications);row('Limitations',data.limitations);
+    y+=4;
+  }
+  // Movement tests
+  function movementTable(title,arr){
+    section(title);
+    for(var i=0;i<arr.length;i++){
+      if(y>270){doc.addPage();y=20;}
+      var t=arr[i];
+      doc.setFont(undefined,'bold');doc.setFontSize(9);
+      doc.text(t.test,margin+3,y);
+      doc.setFont(undefined,'normal');
+      var info='';
+      if(t.full)info+='Full: '+t.full.toUpperCase()+'  ';
+      if(t.limited)info+='Limited: '+t.limited+'in  ';
+      var disc=[];
+      if(t.pinch)disc.push('Pinch');if(t.pull)disc.push('Pull');if(t.stretch)disc.push('Stretch');
+      if(disc.length)info+='Discomfort: '+disc.join(', ')+'  ';
+      doc.setFontSize(8);doc.text(info,margin+3,y+4);
+      if(t.notes){doc.setFont(undefined,'italic');doc.setFontSize(8);doc.text('Notes: '+t.notes,margin+3,y+8);y+=12;}else y+=8;
+    }
+    y+=2;
+  }
+  movementTable('4. Upper Body Movement Test',data.upperBody);
+  movementTable('5. Lower Body Movement Test',data.lowerBody);
+  if(data.plank)row('Max Plank Time',data.plank);
+  // Evaluation
+  if(data.evaluation&&data.evaluation.length){
+    section('6. Fitness Evaluation - '+(data.evalAgeGroup||''));
+    for(var i=0;i<data.evaluation.length;i++){
+      if(y>270){doc.addPage();y=20;}
+      var e=data.evaluation[i];
+      doc.setFont(undefined,'bold');doc.setFontSize(9);
+      doc.text((i+1)+'. '+e.exercise,margin+3,y);
+      doc.setFont(undefined,'normal');
+      doc.text((e.result||'-')+' '+e.unit,pageW-margin-3,y,{align:'right'});
+      if(e.notes){doc.setFont(undefined,'italic');doc.setFontSize(8);doc.text('  '+e.notes,margin+5,y+4);y+=8;}else y+=5;
+    }
+    y+=4;
+  }
+  if(data.observations||data.focus){
+    section('7. Trainer Notes');
+    row('Observations',data.observations);row('Focus Areas',data.focus);
+    if(data.fmScheduled)row('F&M Session',fmtDate(data.fmScheduled));
+  }
+  doc.setTextColor(150,150,150);doc.setFontSize(8);doc.setFont(undefined,'italic');
+  doc.text('CatholicFitPlans - Training Intake Form',margin,290);
+  doc.save('Intake-'+data.name.replace(/ /g,'_')+'-'+today()+'.pdf');
+}
+
 
 document.addEventListener('DOMContentLoaded',function(){
   var bilatInputs=['hipL','hipR','hamL','hamR','quadL','quadR'];
@@ -778,4 +1268,17 @@ document.addEventListener('DOMContentLoaded',function(){
   renderBody();
   refreshAnalyzer();
   loadFromSheets();
+  // Intake init
+  buildPARQ();
+  buildMovementTest('ubmt-container',UBMT_TESTS,'u');
+  buildMovementTest('lbmt-container',LBMT_TESTS,'l');
+  gid('ik-date').value=today();
+  buildEvalRoutine();
+  gid('ik-height').addEventListener('input',calcBMI);
+  gid('ik-weight').addEventListener('input',calcBMI);
+  gid('ik-age').addEventListener('input',buildEvalRoutine);
+  gid('ik-save').addEventListener('click',saveIntake);
+  gid('ik-pdf').addEventListener('click',exportIntakePDF);
+  gid('ik-clear').addEventListener('click',function(){if(confirm('Clear form?'))clearIntakeForm();});
+  gid('ik-load').addEventListener('click',loadExistingIntake);
 });

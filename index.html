@@ -214,6 +214,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
   <div class="tabs">
     <button class="tab on" data-tab="analyzer" type="button">Body Analyzer</button>
     <button class="tab" data-tab="agenda" type="button">Client Agenda</button>
+    <button class="tab" data-tab="intake" type="button">Training Intake</button>
   </div>
 </header>
 
@@ -415,6 +416,92 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);border-bot
       <div class="fg"><label>Notes</label><textarea class="ft" id="pf-notes"></textarea></div>
     </div>
     <div class="md-f"><button class="bc" data-close="m-pay" type="button">Cancel</button><button class="bs" id="b-save-pay" type="button">Save &amp; Generate Invoice</button></div>
+  </div>
+</div>
+
+
+<div class="panel" id="p-intake">
+  <div style="max-width:900px;margin:0 auto;padding:24px">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;flex-wrap:wrap;gap:10px">
+      <div>
+        <h1 style="font-family:'DM Serif Display',serif;font-size:26px;color:var(--pink)">Training Intake</h1>
+        <p style="font-size:12px;color:var(--dgray);margin-top:4px">Complete client evaluation form</p>
+      </div>
+      <div style="display:flex;gap:8px">
+        <button class="btn-e" id="intake-load" type="button">Load Existing</button>
+        <button class="btn-e" id="intake-clear" type="button">Clear Form</button>
+      </div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">1. Basic Information</h3>
+      <div class="fr2" style="margin-top:14px">
+        <div class="fg"><label>Full Name *</label><input class="fi" id="ik-name" placeholder="Maria Garcia"/></div>
+        <div class="fg"><label>Date</label><input class="fi" id="ik-date" type="date"/></div>
+      </div>
+      <div class="fr">
+        <div class="fg"><label>Age</label><input class="fi" id="ik-age" type="number"/></div>
+        <div class="fg"><label>Sex</label><select class="fi" id="ik-sex"><option value="">--</option><option value="F">Female</option><option value="M">Male</option></select></div>
+        <div class="fg"><label>Phone</label><input class="fi" id="ik-phone"/></div>
+      </div>
+      <div class="fg"><label>Email</label><input class="fi" id="ik-email" type="email"/></div>
+      <div class="fr">
+        <div class="fg"><label>Height (cm)</label><input class="fi" id="ik-height" type="number"/></div>
+        <div class="fg"><label>Weight (kg)</label><input class="fi" id="ik-weight" type="number" step="0.1"/></div>
+        <div class="fg"><label>BMI</label><input class="fi" id="ik-bmi" readonly style="background:rgba(139,92,246,.1)"/></div>
+      </div>
+      <div class="fr2">
+        <div class="fg"><label>Main Goal</label><select class="fi" id="ik-goal"><option value="">--</option><option>Weight Loss</option><option>Muscle Gain</option><option>Toning</option><option>Endurance</option><option>Strength</option><option>Mobility</option><option>General Health</option></select></div>
+        <div class="fg"><label>Training Location</label><select class="fi" id="ik-loc"><option value="">--</option><option>Home</option><option>Gym</option><option>Outdoor</option></select></div>
+      </div>
+      <div class="fr2">
+        <div class="fg"><label>Days Per Week</label><select class="fi" id="ik-days"><option value="">--</option><option>1</option><option>2</option><option>3</option><option>4</option><option>5</option><option>6</option><option>7</option></select></div>
+        <div class="fg"><label>Time Per Session</label><select class="fi" id="ik-time"><option value="">--</option><option>30 min</option><option>45 min</option><option>60 min</option><option>90 min</option></select></div>
+      </div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">2. PAR-Q Health Questionnaire</h3>
+      <p style="font-size:11px;color:var(--dgray);margin-top:6px;margin-bottom:14px">Mark Yes or No for each question</p>
+      <div id="parq-container"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">3. Medical History</h3>
+      <div class="fg" style="margin-top:14px"><label>Previous Injuries</label><textarea class="ft" id="ik-injuries"></textarea></div>
+      <div class="fg"><label>Surgeries</label><textarea class="ft" id="ik-surgeries"></textarea></div>
+      <div class="fg"><label>Current Medications</label><textarea class="ft" id="ik-meds"></textarea></div>
+      <div class="fg"><label>Physical Limitations</label><textarea class="ft" id="ik-limits"></textarea></div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">4. Upper Body Movement Test</h3>
+      <div id="ubmt-container" style="margin-top:14px"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">5. Lower Body Movement Test</h3>
+      <div id="lbmt-container" style="margin-top:14px"></div>
+      <div class="fg" style="margin-top:14px"><label>Max Plank Time (min:sec)</label><input class="fi" id="ik-plank" placeholder="e.g. 1:08"/></div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">6. Fitness Evaluation Routine <span id="eval-age-label" style="color:var(--violet);font-weight:400;font-size:11px"></span></h3>
+      <p style="font-size:11px;color:var(--dgray);margin-top:6px;margin-bottom:14px">Routine adapts to client age (enter age above first)</p>
+      <div id="eval-container"></div>
+    </div>
+
+    <div class="box" style="margin-bottom:16px">
+      <h3 style="color:var(--pink);font-size:13px">7. Initial Assessment Notes</h3>
+      <div class="fg" style="margin-top:14px"><label>Trainer's Observations</label><textarea class="ft" id="ik-obs" style="min-height:100px"></textarea></div>
+      <div class="fg"><label>Recommended Focus Areas</label><textarea class="ft" id="ik-focus"></textarea></div>
+      <div class="fg"><label>F&amp;M Session Scheduled</label><input class="fi" id="ik-fm-sched" type="date"/></div>
+    </div>
+
+    <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:30px">
+      <button class="bs" id="ik-save" type="button" style="flex:1;min-width:200px;padding:14px">Save Intake &amp; Create Client</button>
+      <button class="pdf-btn" id="ik-pdf" type="button" style="padding:14px 20px;border-radius:10px">Export PDF</button>
+    </div>
   </div>
 </div>
 
