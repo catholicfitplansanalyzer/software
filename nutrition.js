@@ -4,14 +4,139 @@ function gid(id){return document.getElementById(id);}
 function today(){var d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');}
 function toast(m,err){var t=gid('toast');t.textContent=m;t.className='toast on'+(err?' error':'');setTimeout(function(){t.classList.remove('on');},3500);}
 
-var PROTEIN_SUGGESTIONS=['Huevos','Carne de res','Carne de cerdo','Pavo','Pollo','Pescado blanco','Salmón','Atún','Camarones','Mariscos','Yogurt griego','Queso cottage','Tofu','Tempeh','Proteína en polvo'];
-var CARB_SUGGESTIONS=['Arroz blanco','Arroz integral','Papa','Camote','Yuca','Plátano','Pasta','Pan integral','Tortilla de maíz','Tortilla de harina','Arepa','Frijol','Lentejas','Garbanzos','Avena','Quinoa'];
-var VEGGIE_SUGGESTIONS=['Brócoli','Espinaca','Lechuga','Tomate','Zanahoria','Pepino','Pimiento','Calabacín','Coliflor','Apio','Cebolla','Ajo','Aguacate','Champiñones','Espárragos','Kale'];
-var FRUIT_SUGGESTIONS=['Manzana','Plátano','Fresa','Mora','Arándano','Piña','Mango','Sandía','Melón','Naranja','Mandarina','Uvas','Kiwi','Papaya','Durazno','Pera'];
-var FAT_SUGGESTIONS=['Aguacate','Almendras','Nueces','Maní','Mantequilla de maní','Aceite de oliva','Aceite de coco','Mantequilla','Semillas de chía','Semillas de linaza','Coco','Aceitunas','Queso'];
+// ====== TRANSLATIONS ======
+var T={
+  en:{
+    headerSub:'Nutrition Intake',
+    back:'Back',next:'Next',submit:'Submit Answers',sending:'Sending...',
+    stepOf:'Step %1 of %2',
+    thanksTitle:'Thank you!',
+    thanksMsg:'Your information has been submitted successfully. Your coach will review your answers and contact you soon with your personalized plan.',
+    thanksClose:'You can close this page.',
+    errSend:'Error sending: ',errConn:'Connection error. Try again.',
+    valName:'Please enter your name',valAge:'Please enter your age',valSex:'Please select your sex',valEmail:'Please enter your email',valGoal:'Please select your goal',valActivity:'Please select your activity level',
+    // Step 1: Basic
+    s1_label:'Step 1',s1_title:'Your basic info',s1_sub:"Let's start with some basic information about you.",
+    lblName:'Full Name *',lblDate:'Date',lblAge:'Age *',lblSex:'Sex *',lblEmail:'Email *',lblHeight:'Height (cm)',lblWeight:'Weight (kg)',lblGoal:'Main Goal *',
+    optSelect:'--',optFemale:'Female',optMale:'Male',
+    goals:['Weight Loss','Muscle Gain','Body Building','Toning','Endurance','Strength','Mobility','General Health'],
+    // Step 2: Activity Level
+    s2_label:'Step 2',s2_title:'Activity Level',s2_sub:'How active are you on a typical week? (excluding gym sessions)',
+    actSedentary:'Sedentary',actSedentaryD:'Desk job, little to no exercise',
+    actLight:'Light',actLightD:'Light exercise 1-3 days a week',
+    actModerate:'Moderate',actModerateD:'Moderate exercise 3-5 days a week',
+    actActive:'Active',actActiveD:'Hard exercise 6-7 days a week',
+    actVeryActive:'Very Active',actVeryActiveD:'Very hard exercise + physical job or 2x training',
+    // Step 3: Daily Diet
+    s3_label:'Step 3',s3_title:'Your current diet',s3_sub:'Write your ENTIRE diet for a normal day. Include times, foods, approximate quantities and drinks.',
+    s3_lbl:'Describe your day of meals',
+    s3_ph:'Example:\nBreakfast (7am): 2 scrambled eggs, 1 toast, coffee with milk\nMid-morning (10am): apple\nLunch (1pm): chicken with rice and salad, natural juice\nSnack (4pm): yogurt\nDinner (8pm): grilled fish with vegetables',
+    s3_hint:'Be as specific as possible. Include snacks, drinks, desserts, etc.',
+    // Step 4: Supplements
+    s4_label:'Step 4',s4_title:'Supplementation',s4_sub:'Have you taken supplements or do you want to take any? Describe which ones, when and why.',
+    s4_lbl:'Current or desired supplements',
+    s4_ph:'Example:\n- Whey protein every day after gym\n- Multivitamin in the morning\n- I want to start taking creatine but I dont know how much',
+    s4_hint:'If you take none, write "None". If you want to start, indicate what interests you.',
+    // Step 5: Pathologies
+    s5_label:'Step 5',s5_title:'Health & history',s5_sub:'Write the pathologies, diseases or injuries you have. Even if they seem small, everything counts.',
+    s5_lbl:'Pathologies, diseases, injuries or intolerances',
+    s5_ph:'Example:\n- Right knee injury (2 years ago)\n- Lactose intolerance\n- Hypothyroidism (taking medication)\n- Occasional lower back pain',
+    s5_hint:'Any condition that could affect your training or diet. If you have none, write "None".',
+    // Step 6: Proteins
+    s6_label:'Step 6',s6_title:'Favorite proteins',s6_sub:'Which proteins do you usually eat or like the most? You can select from the list or write your own.',
+    s6_lbl:'Select or write',s6_ph:'Example: eggs, chicken, fish, greek yogurt...',
+    s6_chips:['Eggs','Beef','Pork','Turkey','Chicken','White fish','Salmon','Tuna','Shrimp','Seafood','Greek yogurt','Cottage cheese','Tofu','Tempeh','Protein powder'],
+    // Step 7: Carbs
+    s7_label:'Step 7',s7_title:'Favorite carbs',s7_sub:'Which carbs do you like and have easy access to?',
+    s7_lbl:'Select or write',s7_ph:'Example: rice, potato, oats, whole grain bread...',
+    s7_chips:['White rice','Brown rice','Potato','Sweet potato','Yuca','Plantain','Pasta','Whole grain bread','Corn tortilla','Flour tortilla','Arepa','Beans','Lentils','Chickpeas','Oats','Quinoa'],
+    // Step 8: Veggies
+    s8_label:'Step 8',s8_title:'Favorite vegetables',s8_sub:'Which vegetables do you usually eat or like?',
+    s8_lbl:'Select or write',s8_ph:'Example: broccoli, spinach, tomato, carrot...',
+    s8_chips:['Broccoli','Spinach','Lettuce','Tomato','Carrot','Cucumber','Bell pepper','Zucchini','Cauliflower','Celery','Onion','Garlic','Avocado','Mushrooms','Asparagus','Kale'],
+    // Step 9: Fruits
+    s9_label:'Step 9',s9_title:'Favorite fruits',s9_sub:'Which fruits do you like the most?',
+    s9_lbl:'Select or write',s9_ph:'Example: apple, strawberry, banana, pineapple...',
+    s9_chips:['Apple','Banana','Strawberry','Blackberry','Blueberry','Pineapple','Mango','Watermelon','Melon','Orange','Tangerine','Grapes','Kiwi','Papaya','Peach','Pear'],
+    // Step 10: Fats
+    s10_label:'Step 10',s10_title:'Favorite fats',s10_sub:'Which healthy fats do you like the most?',
+    s10_lbl:'Select or write',s10_ph:'Example: avocado, almonds, olive oil...',
+    s10_chips:['Avocado','Almonds','Walnuts','Peanuts','Peanut butter','Olive oil','Coconut oil','Butter','Chia seeds','Flax seeds','Coconut','Olives','Cheese'],
+    // Step 11: Meals
+    s11_label:'Step 11',s11_title:'Your meal schedule',s11_sub:'How many meals can you have per day?',
+    s11_lbl:'Meals per day *',
+    mealsOpts:['2 meals','3 meals','4 meals','5 meals','6 or more meals'],
+    // Step 12: Gym days
+    s12_label:'Step 12',s12_title:'Your training',s12_sub:'How many days of gym can you do per week?',
+    s12_lbl:'Gym days per week *',
+    gymOpts:['1 day','2 days','3 days','4 days','5 days','6 days','7 days'],
+    // Step 13: Session time
+    s13_label:'Step 13',s13_title:'Training duration',s13_sub:'How much time can you dedicate per training session?',
+    s13_lbl:'Available time per session *',
+    timeOpts:['30 minutes','45 minutes','60 minutes','75 minutes','90 minutes','120 minutes']
+  },
+  es:{
+    headerSub:'Cuestionario de Nutrición',
+    back:'Atrás',next:'Siguiente',submit:'Enviar respuestas',sending:'Enviando...',
+    stepOf:'Paso %1 de %2',
+    thanksTitle:'¡Gracias!',
+    thanksMsg:'Tu información ha sido enviada correctamente. Tu coach recibirá tus respuestas y te contactará pronto con tu plan personalizado.',
+    thanksClose:'Puedes cerrar esta página.',
+    errSend:'Error al enviar: ',errConn:'Error de conexión. Intenta de nuevo.',
+    valName:'Por favor ingresa tu nombre',valAge:'Por favor ingresa tu edad',valSex:'Por favor selecciona tu sexo',valEmail:'Por favor ingresa tu email',valGoal:'Por favor selecciona tu objetivo',valActivity:'Por favor selecciona tu nivel de actividad',
+    s1_label:'Paso 1',s1_title:'Tus datos básicos',s1_sub:'Empecemos con información básica sobre ti.',
+    lblName:'Nombre completo *',lblDate:'Fecha',lblAge:'Edad *',lblSex:'Sexo *',lblEmail:'Email *',lblHeight:'Estatura (cm)',lblWeight:'Peso (kg)',lblGoal:'Objetivo principal *',
+    optSelect:'--',optFemale:'Femenino',optMale:'Masculino',
+    goals:['Bajar de peso','Ganar músculo','Body Building','Tonificación','Resistencia','Fuerza','Movilidad','Salud general'],
+    s2_label:'Paso 2',s2_title:'Nivel de actividad',s2_sub:'¿Qué tan activa es tu semana típica? (sin contar el gym)',
+    actSedentary:'Sedentario',actSedentaryD:'Trabajo de oficina, poco o nada de ejercicio',
+    actLight:'Ligero',actLightD:'Ejercicio ligero 1-3 días a la semana',
+    actModerate:'Moderado',actModerateD:'Ejercicio moderado 3-5 días a la semana',
+    actActive:'Activo',actActiveD:'Ejercicio fuerte 6-7 días a la semana',
+    actVeryActive:'Muy Activo',actVeryActiveD:'Ejercicio muy fuerte + trabajo físico o 2x entrenamientos',
+    s3_label:'Paso 3',s3_title:'Tu alimentación actual',s3_sub:'Escribe TODA tu alimentación de un día normal. Incluye horarios, alimentos, cantidades aproximadas y bebidas.',
+    s3_lbl:'Describe tu día de comidas',
+    s3_ph:'Ejemplo:\nDesayuno (7am): 2 huevos revueltos, 1 tostada, café con leche\nMedia mañana (10am): manzana\nAlmuerzo (1pm): pollo con arroz y ensalada, jugo natural\nMerienda (4pm): yogurt\nCena (8pm): pescado a la plancha con vegetales',
+    s3_hint:'Sé lo más específica posible. Incluye snacks, bebidas, postres, etc.',
+    s4_label:'Paso 4',s4_title:'Suplementación',s4_sub:'¿Has consumido suplementos o quieres consumirlos? Describe cuáles, cuándo y por qué.',
+    s4_lbl:'Suplementos actuales o de interés',
+    s4_ph:'Ejemplo:\n- Whey protein todos los días después del gym\n- Multivitamínico en la mañana\n- Quiero empezar a tomar creatina pero no sé cuánto',
+    s4_hint:'Si no consumes ninguno, escribe "Ninguno". Si quieres empezar, indica qué te interesa.',
+    s5_label:'Paso 5',s5_title:'Salud y antecedentes',s5_sub:'Escribe las patologías, enfermedades o lesiones que tengas. Aunque parezcan pequeñas, todo cuenta.',
+    s5_lbl:'Patologías, enfermedades, lesiones o intolerancias',
+    s5_ph:'Ejemplo:\n- Lesión de rodilla derecha (hace 2 años)\n- Intolerancia a la lactosa\n- Hipotiroidismo (tomo medicamento)\n- Dolor lumbar ocasional',
+    s5_hint:'Cualquier condición que pueda afectar tu entrenamiento o alimentación. Si no tienes nada, escribe "Ninguna".',
+    s6_label:'Paso 6',s6_title:'Proteínas favoritas',s6_sub:'¿Qué proteínas más sueles consumir o te gustan? Puedes seleccionar de la lista o escribir las tuyas.',
+    s6_lbl:'Selecciona o escribe',s6_ph:'Ejemplo: huevos, pollo, pescado, yogurt griego...',
+    s6_chips:['Huevos','Carne de res','Carne de cerdo','Pavo','Pollo','Pescado blanco','Salmón','Atún','Camarones','Mariscos','Yogurt griego','Queso cottage','Tofu','Tempeh','Proteína en polvo'],
+    s7_label:'Paso 7',s7_title:'Carbohidratos favoritos',s7_sub:'¿Qué carbohidratos te gusten y te queden de fácil acceso?',
+    s7_lbl:'Selecciona o escribe',s7_ph:'Ejemplo: arroz, papa, avena, pan integral...',
+    s7_chips:['Arroz blanco','Arroz integral','Papa','Camote','Yuca','Plátano','Pasta','Pan integral','Tortilla de maíz','Tortilla de harina','Arepa','Frijol','Lentejas','Garbanzos','Avena','Quinoa'],
+    s8_label:'Paso 8',s8_title:'Vegetales favoritos',s8_sub:'¿Qué vegetales sueles consumir o te gustan?',
+    s8_lbl:'Selecciona o escribe',s8_ph:'Ejemplo: brócoli, espinaca, tomate, zanahoria...',
+    s8_chips:['Brócoli','Espinaca','Lechuga','Tomate','Zanahoria','Pepino','Pimiento','Calabacín','Coliflor','Apio','Cebolla','Ajo','Aguacate','Champiñones','Espárragos','Kale'],
+    s9_label:'Paso 9',s9_title:'Frutas favoritas',s9_sub:'¿Qué frutas más te gustan?',
+    s9_lbl:'Selecciona o escribe',s9_ph:'Ejemplo: manzana, fresa, plátano, piña...',
+    s9_chips:['Manzana','Plátano','Fresa','Mora','Arándano','Piña','Mango','Sandía','Melón','Naranja','Mandarina','Uvas','Kiwi','Papaya','Durazno','Pera'],
+    s10_label:'Paso 10',s10_title:'Grasas favoritas',s10_sub:'¿Qué grasas saludables más te gustan?',
+    s10_lbl:'Selecciona o escribe',s10_ph:'Ejemplo: aguacate, almendras, aceite de oliva...',
+    s10_chips:['Aguacate','Almendras','Nueces','Maní','Mantequilla de maní','Aceite de oliva','Aceite de coco','Mantequilla','Semillas de chía','Semillas de linaza','Coco','Aceitunas','Queso'],
+    s11_label:'Paso 11',s11_title:'Tu horario de comidas',s11_sub:'¿Cuántas comidas logras hacer al día?',
+    s11_lbl:'Cantidad de comidas al día *',
+    mealsOpts:['2 comidas','3 comidas','4 comidas','5 comidas','6 o más comidas'],
+    s12_label:'Paso 12',s12_title:'Tu entrenamiento',s12_sub:'¿Cuántos días de gym logras hacer por semana?',
+    s12_lbl:'Días de gym por semana *',
+    gymOpts:['1 día','2 días','3 días','4 días','5 días','6 días','7 días'],
+    s13_label:'Paso 13',s13_title:'Duración del entrenamiento',s13_sub:'¿Cuánto tiempo dispones por sesión de entrenamiento?',
+    s13_lbl:'Tiempo disponible por sesión *',
+    timeOpts:['30 minutos','45 minutos','60 minutos','75 minutos','90 minutos','120 minutos']
+  }
+};
 
+var lang='en';
 var formData={
-  name:'',date:today(),age:'',sex:'',phone:'',email:'',height:'',weight:'',goal:'',
+  name:'',date:today(),age:'',sex:'',email:'',height:'',weight:'',goal:'',
+  activityLevel:'',
   dailyDiet:'',supplements:'',pathologies:'',
   proteins:'',carbs:'',vegetables:'',fruits:'',fats:'',
   mealsPerDay:'',gymDays:'',sessionTime:''
@@ -19,57 +144,76 @@ var formData={
 var currentStep=0;
 var STEPS=[];
 
+function L(k){return T[lang][k];}
+
+function setLang(newLang){
+  lang=newLang;
+  document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.dataset.lang===lang);});
+  gid('header-sub').textContent=L('headerSub');
+  gid('lbl-back').textContent=L('back');
+  gid('lbl-next').textContent=L('next');
+  gid('thanks-title').textContent=L('thanksTitle');
+  gid('thanks-msg').textContent=L('thanksMsg');
+  gid('thanks-close').textContent=L('thanksClose');
+  document.documentElement.lang=lang;
+  buildSteps();
+  renderStep();
+}
+
 function buildSteps(){
   STEPS=[
-    {label:'Paso 1',title:'Tus datos básicos',sub:'Empecemos con información básica sobre ti.',render:renderBasic,validate:validateBasic},
-    {label:'Paso 2',title:'Tu alimentación actual',sub:'Escribe TODA tu alimentación de un día normal. Incluye horarios, alimentos, cantidades aproximadas y bebidas.',render:renderDailyDiet,validate:function(){formData.dailyDiet=gid('q-diet').value;return true;}},
-    {label:'Paso 3',title:'Suplementación',sub:'¿Has consumido suplementos o quieres consumirlos? Describe cuáles, cuándo y por qué.',render:renderSupplements,validate:function(){formData.supplements=gid('q-supp').value;return true;}},
-    {label:'Paso 4',title:'Salud y antecedentes',sub:'Escribe las patologías, enfermedades o lesiones que tengas. Aunque parezcan pequeñas, todo cuenta.',render:renderPathologies,validate:function(){formData.pathologies=gid('q-path').value;return true;}},
-    {label:'Paso 5',title:'Proteínas favoritas',sub:'¿Qué proteínas más sueles consumir o te gustan? Puedes seleccionar de la lista o escribir las tuyas.',render:function(c){renderChips(c,'proteins',PROTEIN_SUGGESTIONS,'Ejemplo: huevos, pollo, pescado, yogurt griego...');},validate:function(){formData.proteins=gid('q-text').value;return true;}},
-    {label:'Paso 6',title:'Carbohidratos favoritos',sub:'¿Qué carbohidratos te gusten y te queden de fácil acceso?',render:function(c){renderChips(c,'carbs',CARB_SUGGESTIONS,'Ejemplo: arroz, papa, avena, pan integral...');},validate:function(){formData.carbs=gid('q-text').value;return true;}},
-    {label:'Paso 7',title:'Vegetales favoritos',sub:'¿Qué vegetales sueles consumir o te gustan?',render:function(c){renderChips(c,'vegetables',VEGGIE_SUGGESTIONS,'Ejemplo: brócoli, espinaca, tomate, zanahoria...');},validate:function(){formData.vegetables=gid('q-text').value;return true;}},
-    {label:'Paso 8',title:'Frutas favoritas',sub:'¿Qué frutas más te gustan?',render:function(c){renderChips(c,'fruits',FRUIT_SUGGESTIONS,'Ejemplo: manzana, fresa, plátano, piña...');},validate:function(){formData.fruits=gid('q-text').value;return true;}},
-    {label:'Paso 9',title:'Grasas favoritas',sub:'¿Qué grasas saludables más te gustan?',render:function(c){renderChips(c,'fats',FAT_SUGGESTIONS,'Ejemplo: aguacate, almendras, aceite de oliva...');},validate:function(){formData.fats=gid('q-text').value;return true;}},
-    {label:'Paso 10',title:'Tu horario de comidas',sub:'¿Cuántas comidas logras hacer al día?',render:renderMeals,validate:function(){formData.mealsPerDay=gid('q-meals').value;return formData.mealsPerDay!=='';}},
-    {label:'Paso 11',title:'Tu entrenamiento',sub:'¿Cuántos días de gym logras hacer por semana?',render:renderGymDays,validate:function(){formData.gymDays=gid('q-gym').value;return formData.gymDays!=='';}},
-    {label:'Paso 12',title:'Duración del entrenamiento',sub:'¿Cuánto tiempo dispones por sesión de entrenamiento?',render:renderSessionTime,validate:function(){formData.sessionTime=gid('q-time').value;return formData.sessionTime!=='';},isFinal:true}
+    {key:'s1',render:renderBasic,validate:validateBasic},
+    {key:'s2',render:renderActivity,validate:function(){return formData.activityLevel?true:(alert(L('valActivity')),false);}},
+    {key:'s3',render:function(c){renderTextStep(c,'dailyDiet','s3_lbl','s3_ph','s3_hint','q-diet',240);},validate:function(){formData.dailyDiet=gid('q-diet').value;return true;}},
+    {key:'s4',render:function(c){renderTextStep(c,'supplements','s4_lbl','s4_ph','s4_hint','q-supp',180);},validate:function(){formData.supplements=gid('q-supp').value;return true;}},
+    {key:'s5',render:function(c){renderTextStep(c,'pathologies','s5_lbl','s5_ph','s5_hint','q-path',180);},validate:function(){formData.pathologies=gid('q-path').value;return true;}},
+    {key:'s6',render:function(c){renderChips(c,'proteins','s6_chips','s6_lbl','s6_ph');},validate:function(){formData.proteins=gid('q-text').value;return true;}},
+    {key:'s7',render:function(c){renderChips(c,'carbs','s7_chips','s7_lbl','s7_ph');},validate:function(){formData.carbs=gid('q-text').value;return true;}},
+    {key:'s8',render:function(c){renderChips(c,'vegetables','s8_chips','s8_lbl','s8_ph');},validate:function(){formData.vegetables=gid('q-text').value;return true;}},
+    {key:'s9',render:function(c){renderChips(c,'fruits','s9_chips','s9_lbl','s9_ph');},validate:function(){formData.fruits=gid('q-text').value;return true;}},
+    {key:'s10',render:function(c){renderChips(c,'fats','s10_chips','s10_lbl','s10_ph');},validate:function(){formData.fats=gid('q-text').value;return true;}},
+    {key:'s11',render:function(c){renderSelect(c,'mealsPerDay','s11_lbl','mealsOpts','q-meals');},validate:function(){formData.mealsPerDay=gid('q-meals').value;return formData.mealsPerDay!=='';}},
+    {key:'s12',render:function(c){renderSelect(c,'gymDays','s12_lbl','gymOpts','q-gym');},validate:function(){formData.gymDays=gid('q-gym').value;return formData.gymDays!=='';}},
+    {key:'s13',render:function(c){renderSelect(c,'sessionTime','s13_lbl','timeOpts','q-time');},validate:function(){formData.sessionTime=gid('q-time').value;return formData.sessionTime!=='';},isFinal:true}
   ];
 }
 
 function renderStep(){
   var c=gid('steps-container');
   var step=STEPS[currentStep];
-  c.innerHTML='<div class="step on"><div class="step-label">'+step.label+'</div><div class="step-title">'+step.title+'</div><div class="step-sub">'+step.sub+'</div><div id="step-body"></div></div>';
+  var k=step.key;
+  c.innerHTML='<div class="step on"><div class="step-label">'+L(k+'_label')+'</div><div class="step-title">'+L(k+'_title')+'</div><div class="step-sub">'+L(k+'_sub')+'</div><div id="step-body"></div></div>';
   step.render(gid('step-body'));
   var pct=((currentStep+1)/STEPS.length)*100;
   gid('progress-fill').style.width=pct+'%';
-  gid('step-counter').textContent='Paso '+(currentStep+1)+' de '+STEPS.length;
+  gid('step-counter').textContent=L('stepOf').replace('%1',currentStep+1).replace('%2',STEPS.length);
   gid('btn-back').disabled=currentStep===0;
-  gid('btn-next').textContent=step.isFinal?'Enviar respuestas':'Siguiente \u2192';
+  gid('lbl-next').textContent=step.isFinal?L('submit'):L('next');
   window.scrollTo({top:0,behavior:'smooth'});
 }
 
 function renderBasic(c){
+  var goalsOpts=L('goals').map(function(o){return '<option '+(formData.goal===o?'selected':'')+'>'+o+'</option>';}).join('');
   c.innerHTML='<div class="box">'+
-    '<div class="fg"><label>Nombre completo *</label><input class="fi" id="b-name" placeholder="Maria Garcia" value="'+(formData.name||'')+'"/></div>'+
-    '<div class="fr">'+
-      '<div class="fg"><label>Edad *</label><input class="fi" id="b-age" type="number" value="'+(formData.age||'')+'"/></div>'+
-      '<div class="fg"><label>Sexo *</label><select class="fi" id="b-sex"><option value="">--</option><option value="F" '+(formData.sex==='F'?'selected':'')+'>Femenino</option><option value="M" '+(formData.sex==='M'?'selected':'')+'>Masculino</option></select></div>'+
-      '<div class="fg"><label>Teléfono</label><input class="fi" id="b-phone" value="'+(formData.phone||'')+'"/></div>'+
-    '</div>'+
-    '<div class="fg"><label>Email *</label><input class="fi" id="b-email" type="email" value="'+(formData.email||'')+'"/></div>'+
+    '<div class="fg"><label>'+L('lblName')+'</label><input class="fi" id="b-name" value="'+(formData.name||'')+'"/></div>'+
     '<div class="fr2">'+
-      '<div class="fg"><label>Estatura (cm)</label><input class="fi" id="b-height" type="number" value="'+(formData.height||'')+'"/></div>'+
-      '<div class="fg"><label>Peso (kg)</label><input class="fi" id="b-weight" type="number" step="0.1" value="'+(formData.weight||'')+'"/></div>'+
+      '<div class="fg"><label>'+L('lblDate')+'</label><input class="fi" id="b-date" type="date" value="'+(formData.date||today())+'"/></div>'+
+      '<div class="fg"><label>'+L('lblAge')+'</label><input class="fi" id="b-age" type="number" value="'+(formData.age||'')+'"/></div>'+
     '</div>'+
-    '<div class="fg"><label>Objetivo principal *</label><select class="fi" id="b-goal"><option value="">--</option>'+
-      ['Bajar de peso','Ganar músculo','Body Building','Tonificación','Resistencia','Fuerza','Movilidad','Salud general'].map(function(o){return '<option '+(formData.goal===o?'selected':'')+'>'+o+'</option>';}).join('')+
-    '</select></div>'+
+    '<div class="fr2">'+
+      '<div class="fg"><label>'+L('lblSex')+'</label><select class="fi" id="b-sex"><option value="">'+L('optSelect')+'</option><option value="F" '+(formData.sex==='F'?'selected':'')+'>'+L('optFemale')+'</option><option value="M" '+(formData.sex==='M'?'selected':'')+'>'+L('optMale')+'</option></select></div>'+
+      '<div class="fg"><label>'+L('lblEmail')+'</label><input class="fi" id="b-email" type="email" value="'+(formData.email||'')+'"/></div>'+
+    '</div>'+
+    '<div class="fr2">'+
+      '<div class="fg"><label>'+L('lblHeight')+'</label><input class="fi" id="b-height" type="number" value="'+(formData.height||'')+'"/></div>'+
+      '<div class="fg"><label>'+L('lblWeight')+'</label><input class="fi" id="b-weight" type="number" step="0.1" value="'+(formData.weight||'')+'"/></div>'+
+    '</div>'+
+    '<div class="fg"><label>'+L('lblGoal')+'</label><select class="fi" id="b-goal"><option value="">'+L('optSelect')+'</option>'+goalsOpts+'</select></div>'+
   '</div>';
-  ['b-name','b-age','b-sex','b-phone','b-email','b-height','b-weight','b-goal'].forEach(function(id){
+  ['b-name','b-date','b-age','b-sex','b-email','b-height','b-weight','b-goal'].forEach(function(id){
     var fn=function(){
-      formData.name=gid('b-name').value;formData.age=gid('b-age').value;
-      formData.sex=gid('b-sex').value;formData.phone=gid('b-phone').value;
+      formData.name=gid('b-name').value;formData.date=gid('b-date').value;
+      formData.age=gid('b-age').value;formData.sex=gid('b-sex').value;
       formData.email=gid('b-email').value;formData.height=gid('b-height').value;
       formData.weight=gid('b-weight').value;formData.goal=gid('b-goal').value;
     };
@@ -79,37 +223,54 @@ function renderBasic(c){
 }
 
 function validateBasic(){
-  if(!formData.name||!formData.name.trim()){alert('Por favor ingresa tu nombre');return false;}
-  if(!formData.age){alert('Por favor ingresa tu edad');return false;}
-  if(!formData.sex){alert('Por favor selecciona tu sexo');return false;}
-  if(!formData.email||!formData.email.trim()){alert('Por favor ingresa tu email');return false;}
-  if(!formData.goal){alert('Por favor selecciona tu objetivo');return false;}
+  if(!formData.name||!formData.name.trim()){alert(L('valName'));return false;}
+  if(!formData.age){alert(L('valAge'));return false;}
+  if(!formData.sex){alert(L('valSex'));return false;}
+  if(!formData.email||!formData.email.trim()){alert(L('valEmail'));return false;}
+  if(!formData.goal){alert(L('valGoal'));return false;}
   return true;
 }
 
-function renderDailyDiet(c){
-  c.innerHTML='<div class="box"><div class="fg"><label>Describe tu día de comidas</label><textarea class="ft" id="q-diet" placeholder="Ejemplo:&#10;Desayuno (7am): 2 huevos revueltos, 1 tostada, café con leche&#10;Media mañana (10am): manzana&#10;Almuerzo (1pm): pollo con arroz y ensalada, jugo natural&#10;Merienda (4pm): yogurt&#10;Cena (8pm): pescado a la plancha con vegetales" style="min-height:240px">'+(formData.dailyDiet||'')+'</textarea></div><div class="hint">Sé lo más específica posible. Incluye snacks, bebidas, postres, etc.</div></div>';
+function renderActivity(c){
+  var opts=[
+    {k:'sedentary',n:L('actSedentary'),d:L('actSedentaryD')},
+    {k:'light',n:L('actLight'),d:L('actLightD')},
+    {k:'moderate',n:L('actModerate'),d:L('actModerateD')},
+    {k:'active',n:L('actActive'),d:L('actActiveD')},
+    {k:'very_active',n:L('actVeryActive'),d:L('actVeryActiveD')}
+  ];
+  var h='<div class="activity-grid">';
+  for(var i=0;i<opts.length;i++){
+    var o=opts[i];
+    h+='<div class="activity-opt '+(formData.activityLevel===o.k?'on':'')+'" data-act="'+o.k+'"><div class="a-name">'+o.n+'</div><div class="a-desc">'+o.d+'</div></div>';
+  }
+  h+='</div>';
+  c.innerHTML=h;
+  c.querySelectorAll('.activity-opt').forEach(function(el){
+    el.addEventListener('click',function(){
+      c.querySelectorAll('.activity-opt').forEach(function(x){x.classList.remove('on');});
+      el.classList.add('on');
+      formData.activityLevel=el.dataset.act;
+    });
+  });
 }
 
-function renderSupplements(c){
-  c.innerHTML='<div class="box"><div class="fg"><label>Suplementos actuales o de interés</label><textarea class="ft" id="q-supp" placeholder="Ejemplo:&#10;- Whey protein todos los días después del gym&#10;- Multivitamínico en la mañana&#10;- Quiero empezar a tomar creatina pero no sé cuánto" style="min-height:180px">'+(formData.supplements||'')+'</textarea></div><div class="hint">Si no consumes ninguno, escribe "Ninguno". Si quieres empezar, indica qué te interesa.</div></div>';
+function renderTextStep(c,key,lblKey,phKey,hintKey,id,minHeight){
+  c.innerHTML='<div class="box"><div class="fg"><label>'+L(lblKey)+'</label><textarea class="ft" id="'+id+'" placeholder="'+L(phKey).replace(/\n/g,'&#10;').replace(/"/g,'&quot;')+'" style="min-height:'+minHeight+'px">'+(formData[key]||'')+'</textarea></div><div class="hint">'+L(hintKey)+'</div></div>';
 }
 
-function renderPathologies(c){
-  c.innerHTML='<div class="box"><div class="fg"><label>Patologías, enfermedades, lesiones o intolerancias</label><textarea class="ft" id="q-path" placeholder="Ejemplo:&#10;- Lesión de rodilla derecha (hace 2 años)&#10;- Intolerancia a la lactosa&#10;- Hipotiroidismo (tomo medicamento)&#10;- Dolor lumbar ocasional" style="min-height:180px">'+(formData.pathologies||'')+'</textarea></div><div class="hint">Cualquier condición que pueda afectar tu entrenamiento o alimentación. Si no tienes nada, escribe "Ninguna".</div></div>';
-}
-
-function renderChips(c,key,suggestions,placeholder){
+function renderChips(c,key,chipsKey,lblKey,phKey){
+  var suggestions=L(chipsKey);
   var current=formData[key]||'';
   var selected=current.split(',').map(function(s){return s.trim();}).filter(function(s){return s;});
   var h='<div class="box">';
-  h+='<div class="fg"><label>Selecciona o escribe</label><textarea class="ft" id="q-text" placeholder="'+placeholder+'" style="min-height:90px">'+current+'</textarea></div>';
-  h+='<div style="font-size:11px;color:var(--violet);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:14px;margin-bottom:6px">Sugerencias (toca para agregar)</div>';
+  h+='<div class="fg"><label>'+L(lblKey)+'</label><textarea class="ft" id="q-text" placeholder="'+L(phKey).replace(/"/g,'&quot;')+'" style="min-height:90px">'+current.replace(/</g,'&lt;')+'</textarea></div>';
+  h+='<div style="font-size:11px;color:var(--violet);font-weight:700;letter-spacing:.05em;text-transform:uppercase;margin-top:14px;margin-bottom:6px">'+(lang==='es'?'Sugerencias (toca para agregar)':'Suggestions (tap to add)')+'</div>';
   h+='<div class="chips" id="chips">';
   for(var i=0;i<suggestions.length;i++){
     var s=suggestions[i];
     var on=selected.indexOf(s)>=0?'on':'';
-    h+='<div class="chip '+on+'" data-val="'+s+'">'+s+'</div>';
+    h+='<div class="chip '+on+'" data-val="'+s.replace(/"/g,'&quot;')+'">'+s+'</div>';
   }
   h+='</div></div>';
   c.innerHTML=h;
@@ -126,26 +287,10 @@ function renderChips(c,key,suggestions,placeholder){
   });
 }
 
-function renderMeals(c){
-  var opts=['2 comidas','3 comidas','4 comidas','5 comidas','6 o más comidas'];
-  var h='<div class="box"><div class="fg"><label>Cantidad de comidas al día *</label><select class="fi" id="q-meals"><option value="">--</option>';
-  for(var i=0;i<opts.length;i++)h+='<option '+(formData.mealsPerDay===opts[i]?'selected':'')+'>'+opts[i]+'</option>';
-  h+='</select></div></div>';
-  c.innerHTML=h;
-}
-
-function renderGymDays(c){
-  var opts=['1 día','2 días','3 días','4 días','5 días','6 días','7 días'];
-  var h='<div class="box"><div class="fg"><label>Días de gym por semana *</label><select class="fi" id="q-gym"><option value="">--</option>';
-  for(var i=0;i<opts.length;i++)h+='<option '+(formData.gymDays===opts[i]?'selected':'')+'>'+opts[i]+'</option>';
-  h+='</select></div></div>';
-  c.innerHTML=h;
-}
-
-function renderSessionTime(c){
-  var opts=['30 minutos','45 minutos','60 minutos','75 minutos','90 minutos','120 minutos'];
-  var h='<div class="box"><div class="fg"><label>Tiempo disponible por sesión *</label><select class="fi" id="q-time"><option value="">--</option>';
-  for(var i=0;i<opts.length;i++)h+='<option '+(formData.sessionTime===opts[i]?'selected':'')+'>'+opts[i]+'</option>';
+function renderSelect(c,key,lblKey,optsKey,id){
+  var opts=L(optsKey);
+  var h='<div class="box"><div class="fg"><label>'+L(lblKey)+'</label><select class="fi" id="'+id+'"><option value="">'+L('optSelect')+'</option>';
+  for(var i=0;i<opts.length;i++)h+='<option '+(formData[key]===opts[i]?'selected':'')+'>'+opts[i]+'</option>';
   h+='</select></div></div>';
   c.innerHTML=h;
 }
@@ -163,30 +308,16 @@ function prevStep(){
 
 function submitForm(){
   var payload={
-    id:'n'+Date.now(),
-    date:formData.date,
-    name:formData.name,
-    age:formData.age,
-    sex:formData.sex,
-    phone:formData.phone,
-    email:formData.email,
-    height:formData.height,
-    weight:formData.weight,
-    goal:formData.goal,
-    dailyDiet:formData.dailyDiet,
-    supplements:formData.supplements,
-    pathologies:formData.pathologies,
-    proteins:formData.proteins,
-    carbs:formData.carbs,
-    vegetables:formData.vegetables,
-    fruits:formData.fruits,
-    fats:formData.fats,
-    mealsPerDay:formData.mealsPerDay,
-    gymDays:formData.gymDays,
-    sessionTime:formData.sessionTime
+    id:'n'+Date.now(),date:formData.date,name:formData.name,age:formData.age,sex:formData.sex,
+    phone:'',email:formData.email,height:formData.height,weight:formData.weight,goal:formData.goal,
+    dailyDiet:formData.dailyDiet,supplements:formData.supplements,pathologies:formData.pathologies,
+    proteins:formData.proteins,carbs:formData.carbs,vegetables:formData.vegetables,
+    fruits:formData.fruits,fats:formData.fats,
+    mealsPerDay:formData.mealsPerDay,gymDays:formData.gymDays,sessionTime:formData.sessionTime,
+    activityLevel:formData.activityLevel,language:lang
   };
   gid('btn-next').disabled=true;
-  gid('btn-next').textContent='Enviando...';
+  gid('lbl-next').textContent=L('sending');
   fetch(API_URL,{method:'POST',body:JSON.stringify({action:'saveNutrition',payload:payload})})
     .then(function(r){return r.json();})
     .then(function(resp){
@@ -197,20 +328,22 @@ function submitForm(){
         window.scrollTo({top:0,behavior:'smooth'});
       }else{
         gid('btn-next').disabled=false;
-        gid('btn-next').textContent='Enviar respuestas';
-        toast('Error al enviar: '+(resp.error||'desconocido'),true);
+        gid('lbl-next').textContent=L('submit');
+        toast(L('errSend')+(resp.error||'unknown'),true);
       }
     })
     .catch(function(){
       gid('btn-next').disabled=false;
-      gid('btn-next').textContent='Enviar respuestas';
-      toast('Error de conexión. Intenta de nuevo.',true);
+      gid('lbl-next').textContent=L('submit');
+      toast(L('errConn'),true);
     });
 }
 
 document.addEventListener('DOMContentLoaded',function(){
-  buildSteps();
-  renderStep();
+  document.querySelectorAll('.lang-btn').forEach(function(b){
+    b.addEventListener('click',function(){setLang(b.dataset.lang);});
+  });
+  setLang('en');
   gid('btn-back').addEventListener('click',prevStep);
   gid('btn-next').addEventListener('click',nextStep);
 });
