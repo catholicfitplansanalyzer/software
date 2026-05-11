@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>CatholicFitPlans - Cuestionario de Nutrición</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;500;600;700;800;900&family=DM+Serif+Display&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0b0a1e;--surface:#111029;--card:#181640;--card2:#1e1c4a;--border:#252350;--border2:#302d6e;--pink:#ec4899;--violet:#8b5cf6;--teal:#2dd4bf;--gold:#fbbf24;--orange:#f97316;--red:#ef4444;--green:#34d399;--lgray:#c4b5d8;--mgray:#9585b8;--dgray:#5c5280}
+body{background:var(--bg);color:#fff;font-family:Outfit,sans-serif;min-height:100vh;position:relative;overflow-x:hidden}
+body::before{content:"";position:fixed;inset:0;background-image:url('9E6DC135-0C7C-4D3C-A50D-143B7950C0E0.png');background-repeat:no-repeat;background-position:center;background-size:50%;opacity:.04;pointer-events:none;z-index:0}
+header,.container,.toast,.bottom-nav,.thanks{position:relative;z-index:1}
+header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);padding:14px 24px;display:flex;align-items:center;justify-content:center;gap:10px;border-bottom:2px solid;border-image:linear-gradient(90deg,var(--pink),var(--violet)) 1}
+.brand{display:flex;align-items:center;gap:12px}
+.brand img{width:44px;height:44px;border-radius:50%;object-fit:cover;box-shadow:0 0 20px rgba(236,72,153,.3)}
+.bname{font-family:'DM Serif Display',serif;font-size:21px;letter-spacing:-.5px;text-align:center}
+.bname b{color:var(--pink)}.bname i{color:#a78bfa;font-style:normal}
+.bsub{font-size:9px;color:var(--dgray);letter-spacing:.14em;text-transform:uppercase;margin-top:2px;text-align:center}
+.progress-bar{height:5px;background:var(--card);position:relative;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--pink),var(--violet));width:0%;transition:width .4s ease;box-shadow:0 0 12px rgba(236,72,153,.6)}
+.container{max-width:780px;margin:0 auto;padding:32px 24px 120px}
+.step{display:none;animation:fadeIn .35s ease}
+.step.on{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+.step-label{font-size:11px;color:var(--violet);font-weight:800;letter-spacing:.18em;text-transform:uppercase;margin-bottom:8px}
+.step-title{font-family:'DM Serif Display',serif;font-size:30px;line-height:1.15;background:linear-gradient(135deg,var(--pink),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;margin-bottom:8px}
+.step-sub{font-size:14px;color:var(--mgray);margin-bottom:24px;line-height:1.5}
+.box{background:var(--card);border:1px solid var(--border);border-radius:14px;padding:22px;margin-bottom:18px;box-shadow:0 4px 20px rgba(139,92,246,.06)}
+.fg{margin-bottom:16px}
+.fg label{display:block;font-size:10px;font-weight:700;color:var(--lgray);letter-spacing:.07em;text-transform:uppercase;margin-bottom:6px}
+.fi{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:#fff;font-family:Outfit;font-size:14px;outline:none;transition:border-color .2s}
+.fi:focus{border-color:var(--violet)}
+.ft{width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:10px;padding:12px 14px;color:#fff;font-family:Outfit;font-size:14px;outline:none;resize:vertical;min-height:120px;line-height:1.5}
+.ft:focus{border-color:var(--violet)}
+.fr{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px}
+.fr2{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+@media(max-width:520px){.fr,.fr2{grid-template-columns:1fr}}
+.hint{font-size:12px;color:var(--mgray);font-style:italic;margin-top:6px;line-height:1.5}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.chip{padding:8px 14px;border:1px solid var(--border2);background:var(--card2);border-radius:20px;font-size:12px;cursor:pointer;color:var(--lgray);transition:all .2s;font-family:Outfit}
+.chip:hover{border-color:var(--violet);color:#fff}
+.chip.on{background:linear-gradient(135deg,var(--pink),var(--violet));border-color:transparent;color:#fff;font-weight:700}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:rgba(11,10,30,.95);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-top:1px solid var(--border);padding:14px 24px;display:flex;justify-content:space-between;align-items:center;gap:10px;z-index:100}
+.btn-back,.btn-next{padding:12px 24px;border-radius:10px;font-family:Outfit;font-size:13px;font-weight:800;letter-spacing:.05em;text-transform:uppercase;cursor:pointer;transition:all .2s;border:0}
+.btn-back{background:transparent;border:1px solid var(--border2);color:var(--lgray)}
+.btn-back:hover{border-color:var(--violet);color:#fff}
+.btn-back:disabled{opacity:.4;cursor:not-allowed}
+.btn-next{background:linear-gradient(135deg,var(--pink),var(--violet));color:#fff;box-shadow:0 4px 18px rgba(236,72,153,.4)}
+.btn-next:hover{transform:translateY(-1px);box-shadow:0 6px 24px rgba(236,72,153,.55)}
+.step-counter{font-size:11px;color:var(--mgray);font-weight:700;letter-spacing:.1em;text-transform:uppercase}
+.toast{position:fixed;bottom:80px;right:20px;background:var(--card2);border:1px solid var(--green);border-radius:10px;padding:10px 18px;font-size:12px;color:var(--green);font-weight:600;transform:translateY(80px);opacity:0;transition:all .3s;z-index:2000}
+.toast.on{transform:translateY(0);opacity:1}
+.toast.error{border-color:var(--red);color:var(--red)}
+.thanks{text-align:center;padding:80px 24px;max-width:600px;margin:0 auto}
+.thanks-icon{font-size:64px;background:linear-gradient(135deg,var(--pink),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;margin-bottom:20px}
+.thanks h1{font-family:'DM Serif Display',serif;font-size:36px;background:linear-gradient(135deg,var(--pink),var(--violet));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent;display:inline-block;margin-bottom:14px}
+.thanks p{font-size:15px;color:var(--lgray);line-height:1.6;margin-bottom:20px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">
+    <img src="9E6DC135-0C7C-4D3C-A50D-143B7950C0E0.png" alt="Logo"/>
+    <div>
+      <div class="bname"><b>CatholicFit</b><i>Plans</i></div>
+      <div class="bsub">Cuestionario de Nutrición</div>
+    </div>
+  </div>
+</header>
+
+<div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
+
+<div class="container" id="steps-container"></div>
+
+<div class="thanks" id="thanks" style="display:none">
+  <div class="thanks-icon">&#10003;</div>
+  <h1>¡Gracias!</h1>
+  <p>Tu información ha sido enviada correctamente. Tu coach recibirá tus respuestas y te contactará pronto con tu plan personalizado.</p>
+  <p style="font-size:13px;color:var(--dgray)">Puedes cerrar esta página.</p>
+</div>
+
+<div class="bottom-nav" id="bottom-nav">
+  <button class="btn-back" id="btn-back" type="button">&larr; Atrás</button>
+  <div class="step-counter" id="step-counter">Paso 1</div>
+  <button class="btn-next" id="btn-next" type="button">Siguiente &rarr;</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script src="nutrition.js"></script>
+</body>
+</html>
