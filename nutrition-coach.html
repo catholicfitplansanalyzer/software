@@ -125,6 +125,7 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);backdrop-f
       <button class="lang-btn on" data-lang="en" type="button">EN</button>
     </div>
     <span class="coach-badge" id="coach-badge">Coach View</span>
+    <button class="btn-refresh" id="btn-config" type="button" title="Configure AI">&#9881;</button>
     <button class="btn-refresh" id="btn-refresh" type="button">Refresh</button>
   </div>
 </header>
@@ -161,6 +162,37 @@ header{position:sticky;top:0;z-index:50;background:rgba(11,10,30,.95);backdrop-f
         <button class="tab" data-tab="menu" type="button">Meal Plan</button>
       </div>
       <div id="tab-content"></div>
+    </div>
+  </div>
+</div>
+
+<div class="modal" id="config-modal">
+  <div class="modal-content" style="max-width:520px">
+    <div class="modal-h">
+      <h2 id="config-title">AI Configuration</h2>
+      <button class="modal-x" id="config-close" type="button">&times;</button>
+    </div>
+    <div class="modal-b">
+      <div style="font-size:13px;color:var(--lgray);line-height:1.6;margin-bottom:18px" id="config-help">Paste your Anthropic API key here to enable AI-powered meal plan generation. Your key is stored only in this browser and never uploaded anywhere.</div>
+      <div class="calc-fg" style="margin-bottom:14px">
+        <label id="config-label">Anthropic API Key</label>
+        <input id="config-key" type="password" placeholder="sk-ant-api03-..." style="width:100%;background:var(--card2);border:1px solid var(--border2);border-radius:8px;padding:10px 12px;color:#fff;font-family:Outfit;font-size:13px;outline:none"/>
+      </div>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button class="btn-primary" id="config-save" type="button" style="flex:1">Save</button>
+        <button class="btn-secondary" id="config-clear" type="button">Clear</button>
+      </div>
+      <div style="font-size:11px;color:var(--mgray);margin-top:14px;line-height:1.5" id="config-status"></div>
+      <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--border)">
+        <div style="font-size:11px;color:var(--violet);font-weight:800;letter-spacing:.1em;text-transform:uppercase;margin-bottom:6px">How to get a key</div>
+        <div style="font-size:11px;color:var(--mgray);line-height:1.6">
+          1. Go to <span style="color:var(--teal)">console.anthropic.com</span><br/>
+          2. Sign up and add credit ($5 minimum)<br/>
+          3. Settings &rarr; API Keys &rarr; Create Key<br/>
+          4. Paste here<br/>
+          Cost: ~$0.001 per meal plan (very cheap)
+        </div>
+      </div>
     </div>
   </div>
 </div>

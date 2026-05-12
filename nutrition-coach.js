@@ -7,6 +7,10 @@ var currentTab='details';
 var macroState=null;
 var mealPlan=null;
 var uiLang='en';
+var API_KEY_STORAGE='cfp_anthropic_key';
+function getApiKey(){try{return localStorage.getItem(API_KEY_STORAGE)||'';}catch(e){return '';}}
+function setApiKey(k){try{if(k)localStorage.setItem(API_KEY_STORAGE,k);else localStorage.removeItem(API_KEY_STORAGE);}catch(e){}}
+function hasApiKey(){return !!getApiKey();}
 
 // ===== TRANSLATIONS =====
 var TC={
@@ -50,7 +54,21 @@ var TC={
     activityLabels:{sedentary:'Sedentary',light:'Light',moderate:'Moderate',active:'Active',very_active:'Very Active'},
     mealLabels:{'2':'2 meals','3':'3 meals','4':'4 meals','5':'5 meals','6+':'6 or more meals'},
     gymLabels:{'1':'1 day','2':'2 days','3':'3 days','4':'4 days','5':'5 days','6':'6 days','7':'7 days'},
-    timeLabels:{'30':'30 minutes','45':'45 minutes','60':'60 minutes','75':'75 minutes','90':'90 minutes','120':'120 minutes'}
+    timeLabels:{'30':'30 minutes','45':'45 minutes','60':'60 minutes','75':'75 minutes','90':'90 minutes','120':'120 minutes'},
+    aiConfig:'AI Configuration',
+    aiHelp:'Paste your Anthropic API key here to enable AI-powered meal plan generation. Your key is stored only in this browser and never uploaded anywhere.',
+    aiKeyLabel:'Anthropic API Key',
+    aiSave:'Save',aiClear:'Clear',
+    aiStatusOk:'API key saved. AI features enabled.',
+    aiStatusNone:'No API key set. AI features disabled.',
+    aiStatusSaved:'Saved!',aiStatusCleared:'Cleared.',
+    aiGenerate:'Generate with AI',
+    aiGenerating:'Generating menu with AI...',
+    aiNeedKey:'Set your API key first (gear icon in header).',
+    aiError:'AI error: ',
+    aiSuccess:'Menu generated!',
+    syncOff:'Calories <-> Macros sync',syncOn:'Auto-sync ON',
+    aiPromptHeader:'AI-Powered Meal Plan'
   },
   es:{
     coachView:'Vista Coach',refresh:'Actualizar',
@@ -92,7 +110,21 @@ var TC={
     activityLabels:{sedentary:'Sedentario',light:'Ligero',moderate:'Moderado',active:'Activo',very_active:'Muy activo'},
     mealLabels:{'2':'2 comidas','3':'3 comidas','4':'4 comidas','5':'5 comidas','6+':'6 o mas comidas'},
     gymLabels:{'1':'1 dia','2':'2 dias','3':'3 dias','4':'4 dias','5':'5 dias','6':'6 dias','7':'7 dias'},
-    timeLabels:{'30':'30 minutos','45':'45 minutos','60':'60 minutos','75':'75 minutos','90':'90 minutos','120':'120 minutos'}
+    timeLabels:{'30':'30 minutos','45':'45 minutos','60':'60 minutos','75':'75 minutos','90':'90 minutos','120':'120 minutos'},
+    aiConfig:'Configuracion de IA',
+    aiHelp:'Pega tu API key de Anthropic aqui para activar la generacion de menus con IA. La key se guarda solo en este navegador y nunca se sube a ningun lado.',
+    aiKeyLabel:'API Key de Anthropic',
+    aiSave:'Guardar',aiClear:'Borrar',
+    aiStatusOk:'API key guardada. IA activada.',
+    aiStatusNone:'Sin API key. IA desactivada.',
+    aiStatusSaved:'Guardada!',aiStatusCleared:'Borrada.',
+    aiGenerate:'Generar con IA',
+    aiGenerating:'Generando menu con IA...',
+    aiNeedKey:'Configura tu API key primero (icono de engranaje).',
+    aiError:'Error de IA: ',
+    aiSuccess:'Menu generado!',
+    syncOff:'Sincronizar Calorias <-> Macros',syncOn:'Sincronizacion ON',
+    aiPromptHeader:'Plan de Comidas con IA'
   }
 };
 function tc(k){return TC[uiLang][k];}
@@ -328,14 +360,39 @@ function renderMacrosTab(c){
     renderTab();
   });
   // Live update on macro edits
-  ['m-cal','m-pro','m-fat','m-car'].forEach(function(id){
-    gid(id).addEventListener('change',function(){
-      macroState.calories=parseInt(gid('m-cal').value)||0;
-      macroState.protein=parseInt(gid('m-pro').value)||0;
-      macroState.fat=parseInt(gid('m-fat').value)||0;
-      macroState.carbs=parseInt(gid('m-car').value)||0;
-      renderTab();
-    });
+  // Sync logic: changing macros recalcs calories. Changing calories rebalances macros proportionally.
+  gid('m-pro').addEventListener('change',function(){
+    macroState.protein=parseInt(gid('m-pro').value)||0;
+    macroState.fat=parseInt(gid('m-fat').value)||0;
+    macroState.carbs=parseInt(gid('m-car').value)||0;
+    macroState.calories=macroState.protein*4+macroState.fat*9+macroState.carbs*4;
+    renderTab();
+  });
+  gid('m-fat').addEventListener('change',function(){
+    macroState.protein=parseInt(gid('m-pro').value)||0;
+    macroState.fat=parseInt(gid('m-fat').value)||0;
+    macroState.carbs=parseInt(gid('m-car').value)||0;
+    macroState.calories=macroState.protein*4+macroState.fat*9+macroState.carbs*4;
+    renderTab();
+  });
+  gid('m-car').addEventListener('change',function(){
+    macroState.protein=parseInt(gid('m-pro').value)||0;
+    macroState.fat=parseInt(gid('m-fat').value)||0;
+    macroState.carbs=parseInt(gid('m-car').value)||0;
+    macroState.calories=macroState.protein*4+macroState.fat*9+macroState.carbs*4;
+    renderTab();
+  });
+  gid('m-cal').addEventListener('change',function(){
+    var newCal=parseInt(gid('m-cal').value)||0;
+    var oldCal=macroState.protein*4+macroState.fat*9+macroState.carbs*4;
+    if(oldCal>0){
+      var ratio=newCal/oldCal;
+      macroState.protein=Math.round(macroState.protein*ratio);
+      macroState.fat=Math.round(macroState.fat*ratio);
+      macroState.carbs=Math.round(macroState.carbs*ratio);
+    }
+    macroState.calories=newCal;
+    renderTab();
   });
   gid('btn-save-macros').addEventListener('click',function(){
     mealPlan=null; // force rebuild
@@ -475,7 +532,7 @@ function renderMenuTab(c){
   }
   h+='<div style="display:flex;gap:10px;margin-top:14px;flex-wrap:wrap">';
   h+='<button class="btn-secondary" id="btn-redistribute" type="button">'+tc('autoDist')+'</button>';
-  h+='<button class="btn-secondary" id="btn-regen-foods" type="button">'+tc('resuggest')+'</button>';
+  h+='<button class="btn-primary" id="btn-ai-generate" type="button" style="background:linear-gradient(135deg,var(--gold),var(--orange));border:0;color:#000">&#10024; '+tc('aiGenerate')+'</button>';
   h+='<button class="btn-primary" id="btn-export-menu" type="button" style="flex:1;min-width:200px">'+tc('exportMenu')+'</button>';
   h+='</div>';
   c.innerHTML=h;
@@ -495,10 +552,7 @@ function renderMenuTab(c){
     });
   });
   gid('btn-redistribute').addEventListener('click',function(){mealPlan=buildInitialMealPlan();renderTab();});
-  gid('btn-regen-foods').addEventListener('click',function(){
-    for(var i=0;i<mealPlan.meals.length;i++)mealPlan.meals[i].foods=generateSuggestion(i,mealPlan.meals.length,currentEntry);
-    renderTab();
-  });
+  gid('btn-ai-generate').addEventListener('click',generateMenuWithAI);
   gid('btn-export-menu').addEventListener('click',exportMealPlanPDF);
 }
 
@@ -578,6 +632,144 @@ function exportIntakePDF(id){
   doc.setTextColor(150,150,150);doc.setFontSize(8);doc.setFont(undefined,'italic');
   doc.text(tc('pdfFooterIntake'),margin,290);
   doc.save('Nutrition-'+(e.name||'client').replace(/ /g,'_')+'-'+(e.date||today())+'.pdf');
+}
+
+
+// ===== AI MENU GENERATION =====
+function generateMenuWithAI(){
+  if(!hasApiKey()){
+    toast(tc('aiNeedKey'),true);
+    gid('config-modal').classList.add('on');
+    return;
+  }
+  var e=currentEntry;
+  if(!mealPlan||!macroState){return;}
+  
+  var btn=gid('btn-ai-generate');
+  var orig=btn.innerHTML;
+  btn.disabled=true;
+  btn.innerHTML='&#9203; '+tc('aiGenerating');
+  
+  // Build prompt
+  var clientLang=e.language||uiLang;
+  var prompt=buildAIPrompt(e,mealPlan,clientLang);
+  
+  fetch('https://api.anthropic.com/v1/messages',{
+    method:'POST',
+    headers:{
+      'Content-Type':'application/json',
+      'x-api-key':getApiKey(),
+      'anthropic-version':'2023-06-01',
+      'anthropic-dangerous-direct-browser-access':'true'
+    },
+    body:JSON.stringify({
+      model:'claude-haiku-4-5-20251001',
+      max_tokens:4000,
+      messages:[{role:'user',content:prompt}]
+    })
+  })
+  .then(function(r){return r.json();})
+  .then(function(data){
+    btn.disabled=false;
+    btn.innerHTML=orig;
+    if(data.error){
+      toast(tc('aiError')+(data.error.message||data.error),true);
+      return;
+    }
+    if(!data.content||!data.content[0]){
+      toast(tc('aiError')+'no response',true);
+      return;
+    }
+    var text=data.content[0].text;
+    // Parse JSON from response
+    var jsonMatch=text.match(/\{[\s\S]*\}/);
+    if(!jsonMatch){
+      toast(tc('aiError')+'invalid format',true);
+      console.log('AI response:',text);
+      return;
+    }
+    try{
+      var parsed=JSON.parse(jsonMatch[0]);
+      if(parsed.meals&&parsed.meals.length){
+        for(var i=0;i<mealPlan.meals.length&&i<parsed.meals.length;i++){
+          var m=parsed.meals[i];
+          if(m.name)mealPlan.meals[i].name=m.name;
+          if(m.calories)mealPlan.meals[i].cal=m.calories;
+          if(m.protein)mealPlan.meals[i].pro=m.protein;
+          if(m.fat)mealPlan.meals[i].fat=m.fat;
+          if(m.carbs)mealPlan.meals[i].car=m.carbs;
+          if(m.recipe)mealPlan.meals[i].foods=m.recipe;
+        }
+        renderTab();
+        toast(tc('aiSuccess'));
+      }
+    }catch(err){
+      toast(tc('aiError')+err.message,true);
+      console.log('Parse error:',err,text);
+    }
+  })
+  .catch(function(err){
+    btn.disabled=false;
+    btn.innerHTML=orig;
+    toast(tc('aiError')+err.message,true);
+  });
+}
+
+function buildAIPrompt(e,plan,clientLang){
+  var isEs=(clientLang==='es');
+  var goalLabel=labelGoal(e.goal);
+  var actLabel=labelActivity(e.activityLevel);
+  
+  var mealsList='';
+  for(var i=0;i<plan.meals.length;i++){
+    var m=plan.meals[i];
+    mealsList+='\n'+(i+1)+'. '+m.name+' - Target: '+m.cal+' kcal | Protein: '+m.pro+'g | Fat: '+m.fat+'g | Carbs: '+m.car+'g';
+  }
+  
+  var langInstr=isEs?'Responde en ESPANOL.':'Respond in ENGLISH.';
+  var unitsInstr='Show quantities in BOTH grams and ounces, like: "100g (3.5 oz)".';
+  
+  var prompt=langInstr+'\n\n'+
+  'You are an expert nutritionist creating a personalized meal plan. Build coherent, realistic recipes that match the macro targets EXACTLY.\n\n'+
+  'CLIENT PROFILE:\n'+
+  '- Name: '+(e.name||'Client')+'\n'+
+  '- Age: '+(e.age||'?')+' | Sex: '+(e.sex==='F'?'Female':'Male')+'\n'+
+  '- Weight: '+(e.weight||'?')+' kg | Height: '+(e.height||'?')+' cm\n'+
+  '- Goal: '+goalLabel+'\n'+
+  '- Activity: '+actLabel+'\n\n'+
+  'CLIENT FAVORITES (USE ONLY THESE):\n'+
+  '- Proteins: '+(e.proteins||'any')+'\n'+
+  '- Carbs: '+(e.carbs||'any')+'\n'+
+  '- Vegetables: '+(e.vegetables||'any')+'\n'+
+  '- Fruits: '+(e.fruits||'any')+'\n'+
+  '- Fats: '+(e.fats||'any')+'\n\n'+
+  'HEALTH CONSIDERATIONS:\n'+
+  '- Pathologies/Injuries: '+(e.pathologies||'None')+'\n'+
+  '- Supplements: '+(e.supplements||'None')+'\n'+
+  '- Current diet style: '+(e.dailyDiet||'Not specified')+'\n\n'+
+  'MEALS TO BUILD:'+mealsList+'\n\n'+
+  'RULES:\n'+
+  '1. Each recipe MUST hit the macro targets within +/- 5%.\n'+
+  '2. Recipes must make sense for the time of day (breakfast = breakfast foods, dinner = dinner foods).\n'+
+  '3. USE PRIMARILY the client favorites listed above. Only add minor items (salt, pepper, oil, water) if needed.\n'+
+  '4. '+unitsInstr+'\n'+
+  '5. Include simple prep instructions (1-2 lines per meal).\n'+
+  '6. Consider health conditions in food choices.\n\n'+
+  'OUTPUT FORMAT - Return ONLY valid JSON in this exact structure, no other text:\n'+
+  '{\n'+
+  '  "meals": [\n'+
+  '    {\n'+
+  '      "name": "Meal name in '+(isEs?'Spanish':'English')+'",\n'+
+  '      "calories": 450,\n'+
+  '      "protein": 35,\n'+
+  '      "fat": 12,\n'+
+  '      "carbs": 50,\n'+
+  '      "recipe": "Full ingredient list with quantities AND prep instructions in '+(isEs?'Spanish':'English')+'. Use line breaks (\\n) between ingredients."\n'+
+  '    }\n'+
+  '  ]\n'+
+  '}';
+  
+  return prompt;
 }
 
 function exportMealPlanPDF(){
@@ -681,12 +873,18 @@ document.addEventListener('click',function(ev){
 function setUILang(newLang){
   uiLang=newLang;
   document.querySelectorAll('.lang-btn').forEach(function(b){b.classList.toggle('on',b.dataset.lang===uiLang);});
-  // Update static UI texts
   gid('ui-title').textContent=tc('nutritionSubs');
   gid('ui-subtitle').textContent=tc('subtitle');
   gid('coach-badge').textContent=tc('coachView');
   gid('btn-refresh').textContent=tc('refresh');
   gid('search').placeholder=tc('searchPh');
+  // Config modal
+  gid('config-title').textContent=tc('aiConfig');
+  gid('config-help').textContent=tc('aiHelp');
+  gid('config-label').textContent=tc('aiKeyLabel');
+  gid('config-save').textContent=tc('aiSave');
+  gid('config-clear').textContent=tc('aiClear');
+  updateConfigStatus();
   document.querySelectorAll('.stat-label').forEach(function(el,i){
     if(i===0)el.textContent=tc('total');
     else if(i===1)el.textContent=tc('today');
@@ -702,6 +900,13 @@ function setUILang(newLang){
   if(currentEntry&&gid('modal').classList.contains('on'))renderTab();
 }
 
+function updateConfigStatus(){
+  var s=gid('config-status');
+  if(!s)return;
+  s.textContent=hasApiKey()?tc('aiStatusOk'):tc('aiStatusNone');
+  s.style.color=hasApiKey()?'var(--green)':'var(--mgray)';
+}
+
 document.addEventListener('DOMContentLoaded',function(){
   preloadLogo();
   loadEntries();
@@ -711,6 +916,26 @@ document.addEventListener('DOMContentLoaded',function(){
   gid('modal').addEventListener('click',function(ev){if(ev.target===gid('modal'))gid('modal').classList.remove('on');});
   document.querySelectorAll('.lang-btn').forEach(function(b){
     b.addEventListener('click',function(){setUILang(b.dataset.lang);});
+  });
+  // Config modal
+  gid('btn-config').addEventListener('click',function(){
+    gid('config-key').value=getApiKey();
+    updateConfigStatus();
+    gid('config-modal').classList.add('on');
+  });
+  gid('config-close').addEventListener('click',function(){gid('config-modal').classList.remove('on');});
+  gid('config-modal').addEventListener('click',function(ev){if(ev.target===gid('config-modal'))gid('config-modal').classList.remove('on');});
+  gid('config-save').addEventListener('click',function(){
+    var v=gid('config-key').value.trim();
+    setApiKey(v);
+    updateConfigStatus();
+    toast(tc('aiStatusSaved'));
+  });
+  gid('config-clear').addEventListener('click',function(){
+    setApiKey('');
+    gid('config-key').value='';
+    updateConfigStatus();
+    toast(tc('aiStatusCleared'));
   });
   setUILang('en');
 });
