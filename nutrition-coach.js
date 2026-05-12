@@ -723,21 +723,88 @@ function buildAIPrompt(e,plan,clientLang){
   var mealsList='';
   for(var i=0;i<plan.meals.length;i++){
     var m=plan.meals[i];
-    mealsList+='\n'+(i+1)+'. '+m.name+' - Target: '+m.cal+' kcal | Protein: '+m.pro+'g | Fat: '+m.fat+'g | Carbs: '+m.car+'g';
+    mealsList+='\n'+(i+1)+'. '+m.name+' - TARGET: '+m.cal+' kcal | P: '+m.pro+'g | F: '+m.fat+'g | C: '+m.car+'g';
   }
   
-  var langInstr=isEs?'Responde en ESPANOL.':'Respond in ENGLISH.';
-  var unitsInstr='Show quantities in BOTH grams and ounces, like: "100g (3.5 oz)".';
+  var langInstr=isEs?'Respond ENTIRELY in SPANISH (recipes, ingredient names, instructions).':'Respond ENTIRELY in ENGLISH.';
+  
+  // Nutritional reference table - MUST be accurate
+  var nutritionTable=
+  '\n=== NUTRITIONAL REFERENCE (per 100g cooked unless noted) ===\n'+
+  'PROTEINS:\n'+
+  '- Eggs (1 large, 50g): 6g P | 5g F | 0.4g C | 72 kcal\n'+
+  '- Egg whites (1 large, 33g): 3.6g P | 0g F | 0.2g C | 17 kcal\n'+
+  '- Chicken breast cooked: 31g P | 3.6g F | 0g C | 165 kcal\n'+
+  '- Chicken thigh cooked: 24g P | 11g F | 0g C | 209 kcal\n'+
+  '- Lean beef cooked: 26g P | 15g F | 0g C | 250 kcal\n'+
+  '- Pork tenderloin cooked: 26g P | 5g F | 0g C | 143 kcal\n'+
+  '- Turkey breast cooked: 30g P | 1g F | 0g C | 135 kcal\n'+
+  '- Salmon cooked: 22g P | 13g F | 0g C | 208 kcal\n'+
+  '- Tuna canned in water: 25g P | 1g F | 0g C | 116 kcal\n'+
+  '- White fish (tilapia/cod) cooked: 21g P | 2g F | 0g C | 105 kcal\n'+
+  '- Shrimp cooked: 24g P | 1g F | 0g C | 99 kcal\n'+
+  '- Greek yogurt non-fat (100g): 10g P | 0g F | 4g C | 59 kcal\n'+
+  '- Cottage cheese low-fat: 12g P | 2g F | 4g C | 84 kcal\n'+
+  '- Whey protein powder (30g scoop): 24g P | 1g F | 2g C | 120 kcal\n'+
+  '- Tofu firm: 17g P | 9g F | 2g C | 144 kcal\n'+
+  '\n'+
+  'CARBS (100g uncooked dry weight):\n'+
+  '- White rice uncooked: 7g P | 1g F | 80g C | 365 kcal\n'+
+  '- White rice COOKED (100g): 2.7g P | 0.3g F | 28g C | 130 kcal\n'+
+  '- Brown rice cooked (100g): 2.6g P | 0.9g F | 23g C | 112 kcal\n'+
+  '- Pasta cooked (100g): 5g P | 1g F | 25g C | 131 kcal\n'+
+  '- Potato boiled (100g): 2g P | 0.1g F | 17g C | 77 kcal\n'+
+  '- Sweet potato baked (100g): 2g P | 0.1g F | 21g C | 90 kcal\n'+
+  '- Yuca/cassava boiled (100g): 1.4g P | 0.3g F | 38g C | 160 kcal\n'+
+  '- Plantain boiled (100g): 1.3g P | 0.2g F | 32g C | 122 kcal\n'+
+  '- Bread whole grain (1 slice 30g): 4g P | 1g F | 12g C | 80 kcal\n'+
+  '- Corn tortilla (1 piece 25g): 1.5g P | 0.5g F | 11g C | 55 kcal\n'+
+  '- Flour tortilla (1 piece 45g): 4g P | 3g F | 24g C | 140 kcal\n'+
+  '- Arepa (1 piece 90g): 3g P | 2g F | 33g C | 165 kcal\n'+
+  '- Beans cooked (100g): 9g P | 0.5g F | 23g C | 127 kcal\n'+
+  '- Lentils cooked (100g): 9g P | 0.4g F | 20g C | 116 kcal\n'+
+  '- Chickpeas cooked (100g): 9g P | 2.6g F | 27g C | 164 kcal\n'+
+  '- Oats dry (40g): 5g P | 3g F | 27g C | 150 kcal\n'+
+  '- Quinoa cooked (100g): 4g P | 2g F | 21g C | 120 kcal\n'+
+  '\n'+
+  'FATS:\n'+
+  '- Avocado (100g half a med): 2g P | 15g F | 9g C | 160 kcal\n'+
+  '- Almonds (28g/1oz): 6g P | 14g F | 6g C | 164 kcal\n'+
+  '- Walnuts (28g/1oz): 4g P | 18g F | 4g C | 185 kcal\n'+
+  '- Peanuts (28g/1oz): 7g P | 14g F | 6g C | 161 kcal\n'+
+  '- Peanut butter (15g/1 tbsp): 4g P | 8g F | 3g C | 94 kcal\n'+
+  '- Olive oil (14g/1 tbsp): 0g P | 14g F | 0g C | 119 kcal\n'+
+  '- Coconut oil (14g/1 tbsp): 0g P | 14g F | 0g C | 121 kcal\n'+
+  '- Butter (14g/1 tbsp): 0g P | 12g F | 0g C | 102 kcal\n'+
+  '- Chia seeds (15g): 2.5g P | 5g F | 6g C | 73 kcal\n'+
+  '- Cheese (28g/1oz): 7g P | 9g F | 0.4g C | 113 kcal\n'+
+  '\n'+
+  'FRUITS (medium, ~150g):\n'+
+  '- Apple: 0.5g P | 0.3g F | 25g C | 95 kcal\n'+
+  '- Banana: 1.3g P | 0.4g F | 27g C | 105 kcal\n'+
+  '- Strawberries (100g): 0.7g P | 0.3g F | 8g C | 32 kcal\n'+
+  '- Blueberries (100g): 0.7g P | 0.3g F | 14g C | 57 kcal\n'+
+  '- Pineapple (100g): 0.5g P | 0.1g F | 13g C | 50 kcal\n'+
+  '- Mango (100g): 0.8g P | 0.4g F | 15g C | 60 kcal\n'+
+  '- Orange (medium): 1.2g P | 0.2g F | 15g C | 62 kcal\n'+
+  '- Grapes (100g): 0.6g P | 0.2g F | 17g C | 67 kcal\n'+
+  '\n'+
+  'VEGETABLES (100g raw): all approx 2g P | 0.3g F | 4-7g C | 20-35 kcal\n'+
+  '- Broccoli, spinach, lettuce, tomato, carrot, cucumber, bell pepper, zucchini, cauliflower, asparagus, kale, mushrooms, onion, garlic\n'+
+  '\n'+
+  'DAIRY:\n'+
+  '- Whole milk (100ml): 3.3g P | 3.3g F | 5g C | 61 kcal\n'+
+  '- Skim milk (100ml): 3.4g P | 0.2g F | 5g C | 35 kcal\n';
   
   var prompt=langInstr+'\n\n'+
-  'You are an expert nutritionist creating a personalized meal plan. Build coherent, realistic recipes that match the macro targets EXACTLY.\n\n'+
+  'You are an expert nutritionist (RD/CNS level) creating a personalized meal plan. You MUST use accurate nutritional data and calculate quantities to hit the macro targets WITHIN +/- 5% accuracy.\n\n'+
   'CLIENT PROFILE:\n'+
   '- Name: '+(e.name||'Client')+'\n'+
   '- Age: '+(e.age||'?')+' | Sex: '+(e.sex==='F'?'Female':'Male')+'\n'+
   '- Weight: '+(e.weight||'?')+' kg | Height: '+(e.height||'?')+' cm\n'+
   '- Goal: '+goalLabel+'\n'+
   '- Activity: '+actLabel+'\n\n'+
-  'CLIENT FAVORITES (USE ONLY THESE):\n'+
+  'CLIENT FOOD PREFERENCES (USE ONLY THESE - no substitutions):\n'+
   '- Proteins: '+(e.proteins||'any')+'\n'+
   '- Carbs: '+(e.carbs||'any')+'\n'+
   '- Vegetables: '+(e.vegetables||'any')+'\n'+
@@ -745,29 +812,38 @@ function buildAIPrompt(e,plan,clientLang){
   '- Fats: '+(e.fats||'any')+'\n\n'+
   'HEALTH CONSIDERATIONS:\n'+
   '- Pathologies/Injuries: '+(e.pathologies||'None')+'\n'+
-  '- Supplements: '+(e.supplements||'None')+'\n'+
-  '- Current diet style: '+(e.dailyDiet||'Not specified')+'\n\n'+
-  'MEALS TO BUILD:'+mealsList+'\n\n'+
-  'RULES:\n'+
-  '1. Each recipe MUST hit the macro targets within +/- 5%.\n'+
-  '2. Recipes must make sense for the time of day (breakfast = breakfast foods, dinner = dinner foods).\n'+
-  '3. USE PRIMARILY the client favorites listed above. Only add minor items (salt, pepper, oil, water) if needed.\n'+
-  '4. '+unitsInstr+'\n'+
-  '5. Include simple prep instructions (1-2 lines per meal).\n'+
-  '6. Consider health conditions in food choices.\n\n'+
-  'OUTPUT FORMAT - Return ONLY valid JSON in this exact structure, no other text:\n'+
+  '- Supplements: '+(e.supplements||'None')+'\n\n'+
+  'MEALS TO BUILD (macro targets are MANDATORY):'+mealsList+'\n\n'+
+  nutritionTable+'\n'+
+  'CRITICAL RULES:\n'+
+  '1. ACCURATE MACROS: Use the nutritional reference table above. For each ingredient, calculate its macro contribution based on the EXACT grams you specify. Then VERIFY the sum matches the target within +/- 5%. Example: 3 eggs (150g) = 18g protein, 15g fat, 1.2g carbs, 215 kcal. NOT 38g protein!\n'+
+  '2. SHOW MATH: For each ingredient, write the quantity in BOTH grams and ounces: "100g (3.5 oz)".\n'+
+  '3. COHERENT MEALS BY TIME:\n'+
+  '   - Breakfast: eggs, oats, yogurt, fruit, toast, pancakes\n'+
+  '   - Mid-morning/snack: fruit + nuts, yogurt, protein shake\n'+
+  '   - Lunch: protein + complex carb + veggies (chicken+rice+broccoli)\n'+
+  '   - Snack: small portions, fruit, nuts, yogurt\n'+
+  '   - Dinner: lighter protein + veggies (fish+salad)\n'+
+  '   - Pre-bed: casein-like (cottage cheese, greek yogurt)\n'+
+  '4. USE ONLY client favorite foods (plus minor items: salt, pepper, herbs, lemon, water).\n'+
+  '5. CALCULATE BACKWARDS: Start with target macros. Pick foods. Adjust grams until totals match. DO NOT GUESS quantities.\n'+
+  '6. Include simple prep instructions (2-3 lines).\n'+
+  '7. Consider pathologies (e.g. lactose intolerance = no dairy; diabetes = low simple carbs).\n\n'+
+  'BEFORE RETURNING: Double-check each meal\'s macro totals against its target. If off by more than 5%, adjust grams.\n\n'+
+  'OUTPUT FORMAT - Return ONLY valid JSON, no other text, no markdown:\n'+
   '{\n'+
   '  "meals": [\n'+
   '    {\n'+
   '      "name": "Meal name in '+(isEs?'Spanish':'English')+'",\n'+
-  '      "calories": 450,\n'+
-  '      "protein": 35,\n'+
-  '      "fat": 12,\n'+
-  '      "carbs": 50,\n'+
-  '      "recipe": "Full ingredient list with quantities AND prep instructions in '+(isEs?'Spanish':'English')+'. Use line breaks (\\n) between ingredients."\n'+
+  '      "calories": <integer>,\n'+
+  '      "protein": <integer grams>,\n'+
+  '      "fat": <integer grams>,\n'+
+  '      "carbs": <integer grams>,\n'+
+  '      "recipe": "INGREDIENTS:\\n- Food name: 100g (3.5 oz) = XP/XF/XC\\n- Food name: 50g (1.8 oz) = XP/XF/XC\\n\\nPREPARATION:\\nStep 1...\\nStep 2..."\n'+
   '    }\n'+
   '  ]\n'+
-  '}';
+  '}\n\n'+
+  'The calories/protein/fat/carbs values in the JSON must equal the actual sum of the ingredients listed in the recipe.';
   
   return prompt;
 }
