@@ -731,66 +731,184 @@ function buildAIPrompt(e,plan,clientLang){
   // Nutritional reference table - MUST be accurate
   var nutritionTable=
   '\n=== NUTRITIONAL REFERENCE (per 100g cooked unless noted) ===\n'+
-  'PROTEINS:\n'+
+  'ANIMAL PROTEINS:\n'+
   '- Eggs (1 large, 50g): 6g P | 5g F | 0.4g C | 72 kcal\n'+
   '- Egg whites (1 large, 33g): 3.6g P | 0g F | 0.2g C | 17 kcal\n'+
   '- Chicken breast cooked: 31g P | 3.6g F | 0g C | 165 kcal\n'+
-  '- Chicken thigh cooked: 24g P | 11g F | 0g C | 209 kcal\n'+
-  '- Lean beef cooked: 26g P | 15g F | 0g C | 250 kcal\n'+
-  '- Pork tenderloin cooked: 26g P | 5g F | 0g C | 143 kcal\n'+
+  '- Chicken thigh cooked (skinless): 24g P | 11g F | 0g C | 209 kcal\n'+
   '- Turkey breast cooked: 30g P | 1g F | 0g C | 135 kcal\n'+
+  '- Ground turkey lean cooked: 27g P | 8g F | 0g C | 189 kcal\n'+
+  '- Lean beef (90% lean) cooked: 26g P | 11g F | 0g C | 217 kcal\n'+
+  '- Beef steak cooked (sirloin): 27g P | 12g F | 0g C | 221 kcal\n'+
+  '- Pork tenderloin cooked: 26g P | 5g F | 0g C | 143 kcal\n'+
+  '- Ham (lean) sliced: 18g P | 4g F | 2g C | 120 kcal\n'+
+  '- Bacon cooked (lean): 37g P | 28g F | 1g C | 417 kcal\n'+
   '- Salmon cooked: 22g P | 13g F | 0g C | 208 kcal\n'+
   '- Tuna canned in water: 25g P | 1g F | 0g C | 116 kcal\n'+
-  '- White fish (tilapia/cod) cooked: 21g P | 2g F | 0g C | 105 kcal\n'+
+  '- Tilapia cooked: 26g P | 2.7g F | 0g C | 129 kcal\n'+
+  '- Cod cooked: 23g P | 0.9g F | 0g C | 105 kcal\n'+
+  '- White fish generic cooked: 21g P | 2g F | 0g C | 105 kcal\n'+
+  '- Sardines canned in water: 25g P | 11g F | 0g C | 208 kcal\n'+
   '- Shrimp cooked: 24g P | 1g F | 0g C | 99 kcal\n'+
-  '- Greek yogurt non-fat (100g): 10g P | 0g F | 4g C | 59 kcal\n'+
-  '- Cottage cheese low-fat: 12g P | 2g F | 4g C | 84 kcal\n'+
-  '- Whey protein powder (30g scoop): 24g P | 1g F | 2g C | 120 kcal\n'+
-  '- Tofu firm: 17g P | 9g F | 2g C | 144 kcal\n'+
+  '- Squid/calamari cooked: 18g P | 7g F | 6g C | 165 kcal\n'+
+  '- Seafood mix cooked: 20g P | 2g F | 2g C | 110 kcal\n'+
   '\n'+
-  'CARBS (100g uncooked dry weight):\n'+
-  '- White rice uncooked: 7g P | 1g F | 80g C | 365 kcal\n'+
-  '- White rice COOKED (100g): 2.7g P | 0.3g F | 28g C | 130 kcal\n'+
+  'DAIRY PROTEINS:\n'+
+  '- Greek yogurt non-fat (100g): 10g P | 0g F | 4g C | 59 kcal\n'+
+  '- Greek yogurt 2% (100g): 9g P | 2g F | 4g C | 73 kcal\n'+
+  '- Cottage cheese low-fat (100g): 12g P | 2g F | 4g C | 84 kcal\n'+
+  '- Low-fat cheese (100g): 24g P | 7g F | 2g C | 174 kcal\n'+
+  '- Milk skim (100ml): 3.4g P | 0.2g F | 5g C | 35 kcal\n'+
+  '- Milk whole (100ml): 3.3g P | 3.3g F | 5g C | 61 kcal\n'+
+  '\n'+
+  'SUPPLEMENT PROTEINS:\n'+
+  '- Whey protein (30g scoop): 24g P | 1g F | 2g C | 120 kcal\n'+
+  '- Casein protein (30g scoop): 24g P | 1g F | 3g C | 120 kcal\n'+
+  '- Plant protein powder (30g scoop): 20g P | 2g F | 4g C | 115 kcal\n'+
+  '\n'+
+  'PLANT/VEGAN PROTEINS:\n'+
+  '- Tofu firm (100g): 17g P | 9g F | 2g C | 144 kcal\n'+
+  '- Tofu silken (100g): 8g P | 4g F | 2g C | 70 kcal\n'+
+  '- Tempeh (100g): 19g P | 11g F | 9g C | 192 kcal\n'+
+  '- Seitan (100g): 25g P | 2g F | 14g C | 175 kcal\n'+
+  '- Edamame cooked (100g): 11g P | 5g F | 9g C | 122 kcal\n'+
+  '- Lentils cooked (100g): 9g P | 0.4g F | 20g C | 116 kcal\n'+
+  '- Beans cooked (100g): 9g P | 0.5g F | 23g C | 127 kcal\n'+
+  '- Black beans cooked (100g): 9g P | 0.5g F | 23g C | 132 kcal\n'+
+  '- Chickpeas cooked (100g): 9g P | 2.6g F | 27g C | 164 kcal\n'+
+  '- Quinoa cooked (100g): 4g P | 2g F | 21g C | 120 kcal\n'+
+  '- Hemp seeds (30g): 10g P | 15g F | 2g C | 170 kcal\n'+
+  '- Nutritional yeast (15g/2 tbsp): 8g P | 0.5g F | 5g C | 60 kcal\n'+
+  '- Peanut butter (15g/1 tbsp): 4g P | 8g F | 3g C | 94 kcal\n'+
+  '- Almond butter (15g/1 tbsp): 3.5g P | 9g F | 3g C | 98 kcal\n'+
+  '\n'+
+  'CARBS (cooked unless noted):\n'+
+  '- White rice cooked (100g): 2.7g P | 0.3g F | 28g C | 130 kcal\n'+
   '- Brown rice cooked (100g): 2.6g P | 0.9g F | 23g C | 112 kcal\n'+
+  '- Jasmine rice cooked (100g): 2.7g P | 0.4g F | 28g C | 129 kcal\n'+
+  '- Basmati rice cooked (100g): 3.5g P | 0.4g F | 25g C | 121 kcal\n'+
+  '- Wild rice cooked (100g): 4g P | 0.3g F | 21g C | 101 kcal\n'+
   '- Pasta cooked (100g): 5g P | 1g F | 25g C | 131 kcal\n'+
+  '- Whole wheat pasta cooked (100g): 5g P | 1g F | 25g C | 124 kcal\n'+
+  '- Couscous cooked (100g): 4g P | 0.2g F | 23g C | 112 kcal\n'+
+  '- Barley cooked (100g): 2.3g P | 0.4g F | 28g C | 123 kcal\n'+
+  '- Farro cooked (100g): 5g P | 1g F | 26g C | 130 kcal\n'+
+  '- Buckwheat cooked (100g): 3.4g P | 0.6g F | 20g C | 92 kcal\n'+
+  '- Quinoa cooked (100g): 4g P | 2g F | 21g C | 120 kcal\n'+
   '- Potato boiled (100g): 2g P | 0.1g F | 17g C | 77 kcal\n'+
   '- Sweet potato baked (100g): 2g P | 0.1g F | 21g C | 90 kcal\n'+
-  '- Yuca/cassava boiled (100g): 1.4g P | 0.3g F | 38g C | 160 kcal\n'+
-  '- Plantain boiled (100g): 1.3g P | 0.2g F | 32g C | 122 kcal\n'+
-  '- Bread whole grain (1 slice 30g): 4g P | 1g F | 12g C | 80 kcal\n'+
+  '- Yuca boiled (100g): 1.4g P | 0.3g F | 38g C | 160 kcal\n'+
+  '- Plantain ripe boiled (100g): 1.3g P | 0.2g F | 32g C | 122 kcal\n'+
+  '- Green plantain (100g): 1.3g P | 0.4g F | 31g C | 122 kcal\n'+
+  '- Whole grain bread (1 slice 30g): 4g P | 1g F | 12g C | 80 kcal\n'+
+  '- White bread (1 slice 30g): 2.6g P | 1g F | 14g C | 80 kcal\n'+
+  '- Sourdough (1 slice 30g): 3g P | 0.5g F | 16g C | 85 kcal\n'+
+  '- Bagel plain (1 medium 100g): 11g P | 1.5g F | 53g C | 270 kcal\n'+
+  '- English muffin (1 piece 60g): 5g P | 1g F | 26g C | 135 kcal\n'+
+  '- Pita whole wheat (1 piece 60g): 6g P | 1.7g F | 35g C | 170 kcal\n'+
   '- Corn tortilla (1 piece 25g): 1.5g P | 0.5g F | 11g C | 55 kcal\n'+
   '- Flour tortilla (1 piece 45g): 4g P | 3g F | 24g C | 140 kcal\n'+
   '- Arepa (1 piece 90g): 3g P | 2g F | 33g C | 165 kcal\n'+
-  '- Beans cooked (100g): 9g P | 0.5g F | 23g C | 127 kcal\n'+
-  '- Lentils cooked (100g): 9g P | 0.4g F | 20g C | 116 kcal\n'+
-  '- Chickpeas cooked (100g): 9g P | 2.6g F | 27g C | 164 kcal\n'+
   '- Oats dry (40g): 5g P | 3g F | 27g C | 150 kcal\n'+
-  '- Quinoa cooked (100g): 4g P | 2g F | 21g C | 120 kcal\n'+
+  '- Oat bran dry (30g): 5g P | 2g F | 20g C | 110 kcal\n'+
+  '- Rice cake (1 piece 9g): 0.7g P | 0.2g F | 7g C | 35 kcal\n'+
+  '- Crackers (5 pieces 15g): 1.5g P | 1.5g F | 11g C | 70 kcal\n'+
+  '- Popcorn air-popped (15g): 2g P | 0.6g F | 12g C | 60 kcal\n'+
+  '- Granola (40g): 4g P | 7g F | 22g C | 180 kcal\n'+
   '\n'+
   'FATS:\n'+
-  '- Avocado (100g half a med): 2g P | 15g F | 9g C | 160 kcal\n'+
+  '- Avocado (100g): 2g P | 15g F | 9g C | 160 kcal\n'+
   '- Almonds (28g/1oz): 6g P | 14g F | 6g C | 164 kcal\n'+
   '- Walnuts (28g/1oz): 4g P | 18g F | 4g C | 185 kcal\n'+
   '- Peanuts (28g/1oz): 7g P | 14g F | 6g C | 161 kcal\n'+
+  '- Cashews (28g/1oz): 5g P | 12g F | 9g C | 157 kcal\n'+
+  '- Pistachios (28g/1oz): 6g P | 13g F | 8g C | 159 kcal\n'+
+  '- Pecans (28g/1oz): 3g P | 20g F | 4g C | 196 kcal\n'+
+  '- Brazil nuts (28g/1oz): 4g P | 19g F | 3g C | 186 kcal\n'+
+  '- Macadamia (28g/1oz): 2g P | 21g F | 4g C | 204 kcal\n'+
+  '- Mixed nuts (28g/1oz): 5g P | 16g F | 6g C | 173 kcal\n'+
   '- Peanut butter (15g/1 tbsp): 4g P | 8g F | 3g C | 94 kcal\n'+
+  '- Almond butter (15g/1 tbsp): 3.5g P | 9g F | 3g C | 98 kcal\n'+
+  '- Cashew butter (15g/1 tbsp): 3g P | 8g F | 4g C | 94 kcal\n'+
+  '- Tahini (15g/1 tbsp): 2.6g P | 8g F | 3g C | 89 kcal\n'+
   '- Olive oil (14g/1 tbsp): 0g P | 14g F | 0g C | 119 kcal\n'+
   '- Coconut oil (14g/1 tbsp): 0g P | 14g F | 0g C | 121 kcal\n'+
+  '- Avocado oil (14g/1 tbsp): 0g P | 14g F | 0g C | 124 kcal\n'+
+  '- Sesame oil (14g/1 tbsp): 0g P | 14g F | 0g C | 120 kcal\n'+
   '- Butter (14g/1 tbsp): 0g P | 12g F | 0g C | 102 kcal\n'+
+  '- Ghee (14g/1 tbsp): 0g P | 14g F | 0g C | 123 kcal\n'+
   '- Chia seeds (15g): 2.5g P | 5g F | 6g C | 73 kcal\n'+
-  '- Cheese (28g/1oz): 7g P | 9g F | 0.4g C | 113 kcal\n'+
+  '- Flax seeds (15g): 2.8g P | 6g F | 4g C | 80 kcal\n'+
+  '- Pumpkin seeds (28g/1oz): 9g P | 13g F | 4g C | 158 kcal\n'+
+  '- Sunflower seeds (28g/1oz): 5.5g P | 14g F | 6g C | 165 kcal\n'+
+  '- Sesame seeds (15g): 2.6g P | 7g F | 3g C | 86 kcal\n'+
+  '- Coconut shredded (28g): 1g P | 13g F | 5g C | 132 kcal\n'+
+  '- Olives green (28g): 0.2g P | 3g F | 1g C | 33 kcal\n'+
+  '- Olives black (28g): 0.3g P | 3g F | 2g C | 33 kcal\n'+
+  '- Cheese cheddar (28g/1oz): 7g P | 9g F | 0.4g C | 113 kcal\n'+
+  '- Feta (28g/1oz): 4g P | 6g F | 1g C | 75 kcal\n'+
+  '- Parmesan (28g/1oz): 10g P | 7g F | 1g C | 110 kcal\n'+
+  '- Blue cheese (28g/1oz): 6g P | 8g F | 1g C | 100 kcal\n'+
+  '- Cream cheese (28g/1oz): 2g P | 10g F | 1g C | 100 kcal\n'+
+  '- Dark chocolate 70%+ (28g): 2.2g P | 12g F | 13g C | 170 kcal\n'+
+  '- Mayonnaise (14g/1 tbsp): 0.1g P | 10g F | 0.6g C | 94 kcal\n'+
   '\n'+
-  'FRUITS (medium, ~150g):\n'+
-  '- Apple: 0.5g P | 0.3g F | 25g C | 95 kcal\n'+
-  '- Banana: 1.3g P | 0.4g F | 27g C | 105 kcal\n'+
+  'FRUITS:\n'+
+  '- Apple medium (180g): 0.5g P | 0.3g F | 25g C | 95 kcal\n'+
+  '- Green apple medium (180g): 0.5g P | 0.3g F | 25g C | 95 kcal\n'+
+  '- Banana medium (118g): 1.3g P | 0.4g F | 27g C | 105 kcal\n'+
   '- Strawberries (100g): 0.7g P | 0.3g F | 8g C | 32 kcal\n'+
+  '- Blackberries (100g): 1.4g P | 0.5g F | 10g C | 43 kcal\n'+
   '- Blueberries (100g): 0.7g P | 0.3g F | 14g C | 57 kcal\n'+
+  '- Raspberries (100g): 1.2g P | 0.7g F | 12g C | 52 kcal\n'+
   '- Pineapple (100g): 0.5g P | 0.1g F | 13g C | 50 kcal\n'+
   '- Mango (100g): 0.8g P | 0.4g F | 15g C | 60 kcal\n'+
-  '- Orange (medium): 1.2g P | 0.2g F | 15g C | 62 kcal\n'+
+  '- Watermelon (100g): 0.6g P | 0.2g F | 8g C | 30 kcal\n'+
+  '- Melon (100g): 0.8g P | 0.2g F | 8g C | 34 kcal\n'+
+  '- Cantaloupe (100g): 0.8g P | 0.2g F | 8g C | 34 kcal\n'+
+  '- Orange medium (130g): 1.2g P | 0.2g F | 15g C | 62 kcal\n'+
+  '- Tangerine medium (90g): 0.6g P | 0.2g F | 12g C | 47 kcal\n'+
+  '- Grapefruit (1/2 medium 120g): 0.8g P | 0.1g F | 13g C | 52 kcal\n'+
+  '- Lemon (1 medium 60g): 0.6g P | 0.2g F | 5g C | 17 kcal\n'+
   '- Grapes (100g): 0.6g P | 0.2g F | 17g C | 67 kcal\n'+
+  '- Kiwi (1 medium 70g): 0.8g P | 0.4g F | 11g C | 42 kcal\n'+
+  '- Papaya (100g): 0.5g P | 0.3g F | 11g C | 43 kcal\n'+
+  '- Peach medium (150g): 1.4g P | 0.4g F | 14g C | 59 kcal\n'+
+  '- Pear medium (180g): 0.7g P | 0.2g F | 28g C | 102 kcal\n'+
+  '- Plum medium (66g): 0.5g P | 0.2g F | 8g C | 30 kcal\n'+
+  '- Cherry (100g): 1g P | 0.2g F | 16g C | 63 kcal\n'+
+  '- Apricot (100g): 1.4g P | 0.4g F | 11g C | 48 kcal\n'+
+  '- Pomegranate (100g): 1.7g P | 1.2g F | 19g C | 83 kcal\n'+
+  '- Fig fresh (1 medium 50g): 0.4g P | 0.2g F | 10g C | 37 kcal\n'+
+  '- Date (1 piece 8g): 0.2g P | 0g F | 5g C | 20 kcal\n'+
+  '- Raisins (28g/1oz): 0.8g P | 0.1g F | 22g C | 85 kcal\n'+
+  '- Dried fruit mix (28g): 0.8g P | 0.2g F | 19g C | 80 kcal\n'+
+  '- Guava (100g): 2.6g P | 1g F | 14g C | 68 kcal\n'+
+  '- Passion fruit (1 piece 18g): 0.4g P | 0.1g F | 4g C | 17 kcal\n'+
   '\n'+
-  'VEGETABLES (100g raw): all approx 2g P | 0.3g F | 4-7g C | 20-35 kcal\n'+
-  '- Broccoli, spinach, lettuce, tomato, carrot, cucumber, bell pepper, zucchini, cauliflower, asparagus, kale, mushrooms, onion, garlic\n'+
+  'VEGETABLES (per 100g raw, very low calorie):\n'+
+  '- Broccoli: 2.8g P | 0.4g F | 7g C | 34 kcal\n'+
+  '- Spinach: 2.9g P | 0.4g F | 4g C | 23 kcal\n'+
+  '- Kale: 4.3g P | 0.9g F | 9g C | 49 kcal\n'+
+  '- Romaine lettuce: 1.2g P | 0.3g F | 3g C | 17 kcal\n'+
+  '- Arugula: 2.6g P | 0.7g F | 4g C | 25 kcal\n'+
+  '- Tomato: 0.9g P | 0.2g F | 4g C | 18 kcal\n'+
+  '- Carrot: 0.9g P | 0.2g F | 10g C | 41 kcal\n'+
+  '- Cucumber: 0.7g P | 0.1g F | 4g C | 16 kcal\n'+
+  '- Bell pepper: 1g P | 0.3g F | 6g C | 26 kcal\n'+
+  '- Zucchini: 1.2g P | 0.3g F | 3g C | 17 kcal\n'+
+  '- Pumpkin: 1g P | 0.1g F | 7g C | 26 kcal\n'+
+  '- Cauliflower: 1.9g P | 0.3g F | 5g C | 25 kcal\n'+
+  '- Brussels sprouts: 3.4g P | 0.3g F | 9g C | 43 kcal\n'+
+  '- Cabbage: 1.3g P | 0.1g F | 6g C | 25 kcal\n'+
+  '- Asparagus: 2.2g P | 0.1g F | 4g C | 20 kcal\n'+
+  '- Mushrooms: 3.1g P | 0.3g F | 3g C | 22 kcal\n'+
+  '- Green beans: 1.8g P | 0.2g F | 7g C | 31 kcal\n'+
+  '- Peas: 5.4g P | 0.4g F | 14g C | 81 kcal\n'+
+  '- Eggplant: 1g P | 0.2g F | 6g C | 25 kcal\n'+
+  '- Beets: 1.6g P | 0.2g F | 10g C | 43 kcal\n'+
+  '- Artichoke: 3.3g P | 0.2g F | 11g C | 47 kcal\n'+
+  '- Onion, garlic, ginger: count quantities small (use as flavor, ~5-15g typical)\n'+
   '\n'+
   'DAIRY:\n'+
   '- Whole milk (100ml): 3.3g P | 3.3g F | 5g C | 61 kcal\n'+
